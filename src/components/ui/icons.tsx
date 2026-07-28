@@ -54,3 +54,10 @@ export const Search = makeIcon('search-outline');
 export const Filter = makeIcon('filter-outline');
 export const Image = makeIcon('image-outline');
 export const Info = makeIcon('information-circle-outline');
+export const Lock = makeIcon('lock-closed-outline');
+export const Mail = makeIcon('mail-outline');
+export const Eye = makeIcon('eye-outline');
+export const EyeOff = makeIcon('eye-off-outline');
+export const LogOut = makeIcon('log-out-outline');
+export const ArrowRight = makeIcon('arrow-forward');
+

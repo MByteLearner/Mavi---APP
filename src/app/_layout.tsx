@@ -99,6 +99,7 @@ export default function RootLayout() {
                   contentStyle: { backgroundColor: palette.background },
                 }}
               >
+                <Stack.Screen name="(auth)" />
                 <Stack.Screen name="(tabs)" />
                 <Stack.Screen
                   name="scan"
