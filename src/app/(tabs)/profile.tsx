@@ -1,13 +1,27 @@
 import { View, Text, ScrollView, Pressable, StyleSheet, Switch, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
+import { router } from 'expo-router';
 
+import { useAuthStore } from '@/stores/useAuthStore';
+import { useHaptics } from '@/hooks/useHaptics';
+import { toast } from '@/components/ui/Toast';
 import { ProfileCard, Button, Chip, AnimatedEntry } from '@/components/ui';
-import { ChevronRight, Settings, Notification, Edit, Heart, Target } from '@/components/ui/icons';
+import { ChevronRight, Settings, Notification, Edit, Heart, Target, LogOut } from '@/components/ui/icons';
 import { palette, radius, spacing, typography } from '@/theme';
 
 export default function ProfileScreen() {
   const [notifications, setNotifications] = useState(true);
+  const user = useAuthStore((s) => s.user);
+  const logout = useAuthStore((s) => s.logout);
+  const haptics = useHaptics();
+
+  const handleLogout = () => {
+    haptics.medium();
+    logout();
+    toast.info('Sesión cerrada correctamente');
+    router.replace('/(auth)/login');
+  };
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
@@ -26,13 +40,13 @@ export default function ProfileScreen() {
 
         <AnimatedEntry delay={80}>
           <ProfileCard
-            name="María García"
+            name={user?.name ?? 'María García'}
             level="Nivel Avanzado"
             streak={7}
             weight="68.4"
             height="168"
             age={28}
-            goal="Perder grasa"
+            goal={user?.goal === 'lose' ? 'Perder grasa' : user?.goal === 'gain' ? 'Ganar músculo' : 'Mantener peso'}
           />
         </AnimatedEntry>
 
@@ -86,7 +100,7 @@ export default function ProfileScreen() {
           <Button
             label="Cerrar sesión"
             variant="outlined"
-            onPress={() => Alert.alert('Próximamente')}
+            onPress={handleLogout}
             fullWidth={false}
           />
           <Text style={styles.version}>MAVI v1.0.0</Text>
