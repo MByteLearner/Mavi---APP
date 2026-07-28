@@ -1,56 +1,124 @@
-# Welcome to your Expo app 👋
+# MAVI
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+MAVI es una aplicación móvil (iOS/Android) que actúa como centro de control para un asistente robótico de nutrición. Permite escanear planes nutricionales, sugerir recetas, validar comidas mediante visión artificial (cámara) y sincronizarse con una gramera física (hardware ESP32) para un pesaje asistido de ingredientes.
 
-## Get started
+## Stack
 
-1. Install dependencies
+- **Framework:** Expo (React Native) con Managed Workflow, Expo Router (file-based routing)
+- **Lenguaje:** TypeScript (strict mode)
+- **Estilos:** NativeWind v4 (Tailwind CSS)
+- **Estado:** Zustand (con `persist` para datos persistentes)
+- **Data fetching:** TanStack Query
+- **Hardware:** `react-native-ble-plx` (BLE con ESP32), `expo-camera` + `expo-image-manipulator`
+- **Animaciones:** `react-native-reanimated` 4
+- **Tests:** Jest + `@testing-library/react-native`
 
-   ```bash
-   npm install
-   ```
+## Estructura del proyecto
 
-2. Start the app
+```
+src/
+  app/                  # Rutas (Expo Router)
+    (tabs)/             # Tab navigator (Inicio, Recetas, Progreso, Perfil)
+    scan.tsx            # Escaneo de plan nutricional
+    preparation.tsx     # Flujo de pesaje con gramera
+    validation.tsx      # Validación de plato con cámara
+    +not-found.tsx      # 404
+  components/
+    ui/                 # Componentes reutilizables (Button, Card, IconTile, etc.)
+    CameraPhase.tsx     # Sub-componente de cámara
+  hooks/                # Custom hooks (useBLEScale, useWeightSource, useHaptics, etc.)
+  services/             # API client + queries TanStack Query + mocks
+  stores/               # Zustand stores (useUserStore, useSessionStore, useBLEStore)
+  theme/                # Tokens de diseño
+  types/                # Tipos compartidos
+  constants/            # Strings, BLE constants, recetas
+  utils/                # Utilidades (logger)
 
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+__tests__/              # Tests unitarios (Jest + RNTL)
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Configuración
 
-### Other setup steps
+### Requisitos
+- Node.js 20+
+- Expo CLI
+- Dispositivo físico o emulador iOS/Android
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+### Instalación
 
-## Learn more
+```bash
+npm install --legacy-peer-deps
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+### Variables de entorno (opcional)
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+En `app.json`, dentro de `expo.extra`:
 
-## Join the community
+```json
+{
+  "extra": {
+    "apiUrl": "https://api.mavi.app",
+    "useMocks": true
+  }
+}
+```
 
-Join our community of developers creating universal apps.
+- `useMocks: true` (default) usa respuestas simuladas de plan y validación.
+- `useMocks: false` llama al backend real en `apiUrl`.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Scripts
+
+| Comando | Descripción |
+|---|---|
+| `npm start` | Inicia Metro Bundler |
+| `npm run android` | Build y corre en Android |
+| `npm run ios` | Build y corre en iOS |
+| `npm run web` | Inicia versión web |
+| `npm run lint` | Ejecuta ESLint con config de Expo |
+| `npm run typecheck` | TypeScript strict mode check |
+| `npm test` | Corre tests con Jest |
+| `npm run test:coverage` | Tests + reporte de cobertura |
+| `npm run test:watch` | Tests en modo watch |
+
+## Hardware
+
+### Gramera ESP32
+
+- Nombre del dispositivo: `MAVI_SCALE` (configurable en `src/constants/ble.ts`)
+- Service UUID: `0000fff0-0000-1000-8000-00805f9b34fb`
+- Characteristic UUID: `0000fff1-0000-1000-8000-00805f9b34fb`
+- Formato del payload: 2 bytes little-endian, valor en gramos × 10 (parseado en `useBLEScale.parseWeightPayload`)
+
+Si no hay gramera conectada, la app usa automáticamente el simulador (`useWeightSimulator`).
+
+### Cámara
+
+- Permisos configurados en `app.json` (iOS y Android)
+- Captura + compresión en `useCamera`
+- Validación mockeada en `src/services/aiValidator.ts` (reemplazable por API real)
+
+## Mock vs backend
+
+Mientras no exista backend, todos los servicios en `src/services/` están mockeados con latencia simulada. Para conectar a un backend real:
+
+1. Configurar `apiUrl` y `useMocks: false` en `app.json`
+2. Implementar los endpoints en el backend:
+   - `POST /api/plans/scan` → recibe archivo (PDF o imagen), devuelve `{ plan, suggestedRecipes }`
+   - `POST /api/meals/validate` → recibe foto + recipeId, devuelve `{ success, confidence, message, detectedIngredients }`
+
+Los tipos compartidos están en `src/types/plan.ts` y `src/types/validation.ts`.
+
+## Dark mode
+
+Activado por NativeWind (`darkMode: "class"`). El hook `useColorScheme` aplica la clase `dark` al root en función del esquema del sistema.
+
+## Accesibilidad
+
+- `accessibilityLabel` en todos los botones de íconos
+- `accessibilityRole="button"` consistente
+- `accessibilityLiveRegion="polite"` en el display numérico de peso
+- `accessibilityRole="progressbar"` en `ProgressBar`
+
+## Licencia
+
+MIT

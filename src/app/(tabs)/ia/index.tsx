@@ -1,0 +1,224 @@
+import { View, Text, ScrollView, Pressable, TextInput, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useState } from 'react';
+
+import { AIRecommendationCard, Chip } from '@/components/ui';
+import { Mic, Send, Sparkles, Image } from '@/components/ui/icons';
+import { palette, radius, spacing, typography } from '@/theme';
+
+interface ChatMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  text: string;
+}
+
+const seed: ChatMessage[] = [
+  {
+    id: '1',
+    role: 'assistant',
+    text: '¡Hola! Soy MAVI, tu asistente nutricional. Hoy te recomiendo una cena ligera con proteínas para terminar el día. ¿Querés que te sugiera algo?',
+  },
+];
+
+const suggestions = [
+  '¿Qué puedo cenar hoy?',
+  '¿Cuánta proteína necesito?',
+  'Sugerí un snack saludable',
+];
+
+export default function IAScreen() {
+  const [messages] = useState<ChatMessage[]>(seed);
+  const [input, setInput] = useState('');
+
+  return (
+    <SafeAreaView style={styles.safe} edges={['top']}>
+      <View style={styles.header}>
+        <View style={styles.headerLeft}>
+          <View style={styles.avatar}>
+            <Sparkles size={20} color={palette.textInverse} />
+          </View>
+          <View>
+            <Text style={styles.headerTitle}>MAVI IA</Text>
+            <View style={styles.statusRow}>
+              <View style={styles.statusDot} />
+              <Text style={styles.statusText}>En línea</Text>
+            </View>
+          </View>
+        </View>
+        <Chip label="Beta" tone="warning" />
+      </View>
+
+      <ScrollView
+        style={styles.feed}
+        contentContainerStyle={styles.feedContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {messages.map((m) => (
+          <View
+            key={m.id}
+            style={[
+              styles.bubble,
+              m.role === 'user' ? styles.bubbleUser : styles.bubbleAssistant,
+            ]}
+          >
+            <Text
+              style={[
+                styles.bubbleText,
+                m.role === 'user' ? styles.bubbleTextUser : styles.bubbleTextAssistant,
+              ]}
+            >
+              {m.text}
+            </Text>
+          </View>
+        ))}
+
+        <View style={styles.suggestionsBlock}>
+          <Text style={styles.suggestionsTitle}>Sugerencias para vos</Text>
+          <View style={{ gap: spacing.sm }}>
+            <AIRecommendationCard
+              title="Cena ligera con proteínas"
+              body="Recomiendo pollo grillado con ensalada verde. Bajo en calorías y alto en proteínas para recuperarte del entrenamiento."
+              tag="Recomendado"
+            />
+            <AIRecommendationCard
+              title="Snack pre-entrenamiento"
+              body="Un plátano con mantequilla de maní te dará energía sostenida para tu sesión de la tarde."
+              tag="Para hoy 17:00"
+            />
+          </View>
+        </View>
+      </ScrollView>
+
+      <View style={styles.composer}>
+        <View style={styles.suggestionsRow}>
+          {suggestions.map((s) => (
+            <Pressable key={s} style={styles.suggestionPill}>
+              <Text style={styles.suggestionText}>{s}</Text>
+            </Pressable>
+          ))}
+        </View>
+        <View style={styles.inputRow}>
+          <Pressable style={styles.iconBtn} accessibilityLabel="Adjuntar imagen">
+            <Image size={20} color={palette.textSecondary} />
+          </Pressable>
+          <TextInput
+            value={input}
+            onChangeText={setInput}
+            placeholder="Escribí tu pregunta..."
+            placeholderTextColor={palette.textDisabled}
+            style={styles.input}
+          />
+          <Pressable style={styles.iconBtn} accessibilityLabel="Dictar">
+            <Mic size={20} color={palette.textSecondary} />
+          </Pressable>
+          <Pressable
+            style={[styles.sendBtn, !input && styles.sendBtnDisabled]}
+            accessibilityLabel="Enviar"
+            disabled={!input}
+          >
+            <Send size={18} color={palette.textInverse} />
+          </Pressable>
+        </View>
+      </View>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  safe: { flex: 1, backgroundColor: palette.background },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    backgroundColor: palette.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: palette.divider,
+  },
+  headerLeft: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: palette.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerTitle: { ...typography.bodyMedium, color: palette.textPrimary, fontWeight: '700' },
+  statusRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 },
+  statusDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: palette.success },
+  statusText: { ...typography.caption, color: palette.textSecondary },
+  feed: { flex: 1 },
+  feedContent: { padding: spacing.lg, paddingBottom: spacing['2xl'] },
+  bubble: {
+    padding: spacing.md,
+    borderRadius: radius.lg,
+    marginBottom: spacing.sm,
+    maxWidth: '85%',
+  },
+  bubbleUser: {
+    alignSelf: 'flex-end',
+    backgroundColor: palette.primary,
+  },
+  bubbleAssistant: {
+    alignSelf: 'flex-start',
+    backgroundColor: palette.surface,
+  },
+  bubbleText: { ...typography.body, lineHeight: 22 },
+  bubbleTextUser: { color: palette.textInverse },
+  bubbleTextAssistant: { color: palette.textPrimary },
+  suggestionsBlock: { marginTop: spacing.lg, gap: spacing.md },
+  suggestionsTitle: {
+    ...typography.subheading,
+    color: palette.textPrimary,
+    fontWeight: '700',
+    marginBottom: spacing.xs,
+  },
+  composer: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.lg,
+    backgroundColor: palette.surface,
+    borderTopWidth: 1,
+    borderTopColor: palette.divider,
+  },
+  suggestionsRow: { flexDirection: 'row', gap: spacing.sm, marginBottom: spacing.sm, flexWrap: 'wrap' },
+  suggestionPill: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: radius.pill,
+    backgroundColor: '#FFEDED',
+  },
+  suggestionText: { ...typography.caption, color: palette.primary, fontWeight: '600' },
+  inputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: palette.background,
+    borderRadius: radius.pill,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  iconBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  input: {
+    flex: 1,
+    ...typography.body,
+    color: palette.textPrimary,
+    paddingHorizontal: 8,
+  },
+  sendBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: palette.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sendBtnDisabled: { backgroundColor: palette.textDisabled, opacity: 0.5 },
+});

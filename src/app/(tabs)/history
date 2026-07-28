@@ -1,0 +1,98 @@
+import { Flame } from '@/components/ui/icons';
+import { Text, View, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { useUserStore } from '@/stores/useUserStore';
+import { STRINGS } from '@/constants/strings';
+
+export default function ProgressScreen() {
+  const streak = useUserStore((state) => state.streak);
+
+  return (
+    <SafeAreaView style={styles.safe}>
+      <View style={styles.container}>
+        <Text style={styles.brandLabel}>MAVI</Text>
+        <Text accessibilityRole="header" style={styles.title}>
+          {STRINGS.progress.title}
+        </Text>
+        <Text style={styles.prompt}>{STRINGS.progress.subtitle}</Text>
+
+        <View style={styles.streakCard}>
+          <View style={styles.iconCircle}>
+            <Flame size={28} color="#EA580C" />
+          </View>
+          <Text style={styles.streakNumber}>{streak}</Text>
+          <Text style={styles.streakLabel}>{STRINGS.progress.daysLabel}</Text>
+        </View>
+
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>{STRINGS.progress.emptyBody}</Text>
+        </View>
+      </View>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  safe: { flex: 1, backgroundColor: '#FFFFFF' },
+  container: { flex: 1, paddingHorizontal: 24, paddingTop: 64 },
+  brandLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+    letterSpacing: 2,
+    color: '#6B7280',
+    textTransform: 'uppercase',
+    marginBottom: 8,
+  },
+  title: {
+    fontSize: 36,
+    fontWeight: '300',
+    color: '#111827',
+    letterSpacing: -0.5,
+    marginBottom: 8,
+  },
+  prompt: {
+    fontSize: 16,
+    color: '#6B7280',
+    lineHeight: 24,
+    marginBottom: 40,
+  },
+  streakCard: {
+    alignItems: 'center',
+    backgroundColor: '#F9FAFB',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 24,
+    paddingVertical: 48,
+    paddingHorizontal: 24,
+  },
+  iconCircle: {
+    width: 56,
+    height: 56,
+    borderRadius: 16,
+    backgroundColor: '#FFEDD5',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  streakNumber: {
+    fontSize: 72,
+    fontWeight: '700',
+    color: '#111827',
+    letterSpacing: -1,
+    fontVariant: ['tabular-nums'],
+  },
+  streakLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#6B7280',
+    marginTop: 8,
+  },
+  footer: { flex: 1, justifyContent: 'flex-end', alignItems: 'center', paddingBottom: 16 },
+  footerText: {
+    fontSize: 14,
+    color: '#9CA3AF',
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+});
