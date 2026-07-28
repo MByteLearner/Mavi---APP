@@ -2,8 +2,8 @@ import { View, Text, ScrollView, Pressable, TextInput, StyleSheet } from 'react-
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
 
-import { AIRecommendationCard, Chip } from '@/components/ui';
-import { Mic, Send, Sparkles, Image } from '@/components/ui/icons';
+import { AIRecommendationCard, Chip, AnimatedEntry } from '@/components/ui';
+import { Mic, Send, Image } from '@/components/ui/icons';
 import { palette, radius, spacing, typography } from '@/theme';
 
 interface ChatMessage {
@@ -16,7 +16,7 @@ const seed: ChatMessage[] = [
   {
     id: '1',
     role: 'assistant',
-    text: '¡Hola! Soy MAVI, tu asistente nutricional. Hoy te recomiendo una cena ligera con proteínas para terminar el día. ¿Querés que te sugiera algo?',
+    text: 'Hola, soy MAVI. Hoy te propongo una cena ligera con proteínas para terminar el día. ¿Querés que te sugiera algo?',
   },
 ];
 
@@ -35,7 +35,7 @@ export default function IAScreen() {
       <View style={styles.header}>
         <View style={styles.headerLeft}>
           <View style={styles.avatar}>
-            <Sparkles size={20} color={palette.textInverse} />
+            <Text style={styles.avatarText}>✦</Text>
           </View>
           <View>
             <Text style={styles.headerTitle}>MAVI IA</Text>
@@ -54,27 +54,29 @@ export default function IAScreen() {
         showsVerticalScrollIndicator={false}
       >
         {messages.map((m) => (
-          <View
-            key={m.id}
-            style={[
-              styles.bubble,
-              m.role === 'user' ? styles.bubbleUser : styles.bubbleAssistant,
-            ]}
-          >
-            <Text
+          <AnimatedEntry key={m.id} delay={80}>
+            <View
               style={[
-                styles.bubbleText,
-                m.role === 'user' ? styles.bubbleTextUser : styles.bubbleTextAssistant,
+                styles.bubble,
+                m.role === 'user' ? styles.bubbleUser : styles.bubbleAssistant,
               ]}
             >
-              {m.text}
-            </Text>
-          </View>
+              <Text
+                style={[
+                  styles.bubbleText,
+                  m.role === 'user' ? styles.bubbleTextUser : styles.bubbleTextAssistant,
+                  m.role === 'assistant' && styles.bubbleTextSerif,
+                ]}
+              >
+                {m.text}
+              </Text>
+            </View>
+          </AnimatedEntry>
         ))}
 
         <View style={styles.suggestionsBlock}>
           <Text style={styles.suggestionsTitle}>Sugerencias para vos</Text>
-          <View style={{ gap: spacing.sm }}>
+          <View style={{ gap: spacing.md }}>
             <AIRecommendationCard
               title="Cena ligera con proteínas"
               body="Recomiendo pollo grillado con ensalada verde. Bajo en calorías y alto en proteínas para recuperarte del entrenamiento."
@@ -145,7 +147,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  headerTitle: { ...typography.bodyMedium, color: palette.textPrimary, fontWeight: '700' },
+  avatarText: { color: palette.textInverse, fontSize: 18, fontWeight: '700', fontFamily: 'Fraunces_700Bold' },
+  headerTitle: { ...typography.bodyMedium, color: palette.textPrimary, fontWeight: '700', fontFamily: 'Fraunces_500Medium', fontSize: 16 },
   statusRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 },
   statusDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: palette.success },
   statusText: { ...typography.caption, color: palette.textSecondary },
@@ -155,24 +158,27 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     borderRadius: radius.lg,
     marginBottom: spacing.sm,
-    maxWidth: '85%',
+    maxWidth: '88%',
+    borderWidth: 1,
   },
   bubbleUser: {
     alignSelf: 'flex-end',
     backgroundColor: palette.primary,
+    borderColor: palette.primary,
   },
   bubbleAssistant: {
     alignSelf: 'flex-start',
     backgroundColor: palette.surface,
+    borderColor: palette.border,
   },
-  bubbleText: { ...typography.body, lineHeight: 22 },
+  bubbleText: { ...typography.body, lineHeight: 24 },
   bubbleTextUser: { color: palette.textInverse },
   bubbleTextAssistant: { color: palette.textPrimary },
+  bubbleTextSerif: { fontFamily: 'Fraunces_400Regular', fontSize: 16, lineHeight: 26 },
   suggestionsBlock: { marginTop: spacing.lg, gap: spacing.md },
   suggestionsTitle: {
-    ...typography.subheading,
+    ...typography.titleSecondary,
     color: palette.textPrimary,
-    fontWeight: '700',
     marginBottom: spacing.xs,
   },
   composer: {
@@ -188,7 +194,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: radius.pill,
-    backgroundColor: '#FFEDED',
+    backgroundColor: palette.primarySoft,
   },
   suggestionText: { ...typography.caption, color: palette.primary, fontWeight: '600' },
   inputRow: {
@@ -198,6 +204,8 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
     paddingHorizontal: 8,
     paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: palette.border,
   },
   iconBtn: {
     width: 36,

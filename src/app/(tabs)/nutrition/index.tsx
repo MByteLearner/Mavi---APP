@@ -10,8 +10,9 @@ import {
   Chip,
   EmptyState,
   Button,
+  AnimatedEntry,
 } from '@/components/ui';
-import { ChevronRight, Nutrition } from '@/components/ui/icons';
+import { ChevronRight } from '@/components/ui/icons';
 import { palette, radius, spacing, typography } from '@/theme';
 
 export default function NutritionScreen() {
@@ -23,17 +24,20 @@ export default function NutritionScreen() {
     return (
       <SafeAreaView style={styles.safe} edges={['top']}>
         <View style={styles.container}>
-          <ScreenHeader
-            title="Nutrición"
-            subtitle="Recetas recomendadas para tu plan"
-          />
+          <AnimatedEntry>
+            <ScreenHeader
+              eyebrow="Nutrición"
+              title="Tu plan"
+              subtitle="Recetas personalizadas según tu dieta médica"
+            />
+          </AnimatedEntry>
           <EmptyState
-            icon={<Nutrition size={40} color={palette.primary} />}
-            title="Escaneá tu plan primero"
-            body="Subí tu dieta médica y te mostraremos recetas pensadas para vos."
+            illustration="recipe"
+            title="Aún no escaneaste tu plan"
+            body="Subí tu dieta médica y te mostraremos recetas pensadas para tus objetivos."
             action={
               <Button
-                label="Escanear plan"
+                label="Escanear mi plan"
                 size="md"
                 fullWidth={false}
                 onPress={() => router.push('/scan')}
@@ -51,51 +55,57 @@ export default function NutritionScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <ScreenHeader
-          title="Nutrición"
-          subtitle="Recetas para tu plan de hoy"
-        />
+        <AnimatedEntry>
+          <ScreenHeader
+            eyebrow="Nutrición"
+            title="Recetas para hoy"
+            subtitle="Elegí una opción para tu próxima comida"
+          />
+        </AnimatedEntry>
 
-        <View style={styles.filterRow}>
-          <Chip label="Todas" tone="brand" />
-          <Chip label="Desayuno" tone="neutral" />
-          <Chip label="Almuerzo" tone="neutral" />
-          <Chip label="Cena" tone="neutral" />
-          <Chip label="Snack" tone="neutral" />
-        </View>
+        <AnimatedEntry delay={80}>
+          <View style={styles.filterRow}>
+            <Chip label="Todas" tone="brand" />
+            <Chip label="Desayuno" tone="neutral" />
+            <Chip label="Almuerzo" tone="neutral" />
+            <Chip label="Cena" tone="neutral" />
+            <Chip label="Snack" tone="neutral" />
+          </View>
+        </AnimatedEntry>
 
         <View style={styles.list}>
-          {RECIPES.map((recipe) => {
+          {RECIPES.map((recipe, idx) => {
             const isSelected = activeRecipeId === recipe.id;
             return (
-              <Pressable
-                key={recipe.id}
-                onPress={() => {
-                  startWeighing(recipe.id);
-                  router.push('/preparation');
-                }}
-                style={({ pressed }) => [
-                  styles.item,
-                  isSelected && styles.itemSelected,
-                  pressed && styles.itemPressed,
-                ]}
-              >
-                <View style={styles.itemEmoji}>
-                  <Text style={styles.itemEmojiText}>{recipe.emoji}</Text>
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.itemName}>{recipe.name}</Text>
-                  <Text style={styles.itemDescription}>{recipe.description}</Text>
-                  <View style={styles.itemMeta}>
-                    <Text style={styles.itemMetaText}>
-                      {recipe.ingredients.length} ingredientes
-                    </Text>
-                    <Text style={styles.itemMetaDot}>•</Text>
-                    <Text style={styles.itemMetaText}>{recipe.calories} kcal</Text>
+              <AnimatedEntry key={recipe.id} delay={140 + idx * 60}>
+                <Pressable
+                  onPress={() => {
+                    startWeighing(recipe.id);
+                    router.push('/preparation');
+                  }}
+                  style={({ pressed }) => [
+                    styles.item,
+                    isSelected && styles.itemSelected,
+                    pressed && styles.itemPressed,
+                  ]}
+                >
+                  <View style={styles.itemEmoji}>
+                    <Text style={styles.itemEmojiText}>{recipe.emoji}</Text>
                   </View>
-                </View>
-                <ChevronRight size={20} color={palette.textDisabled} />
-              </Pressable>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.itemName}>{recipe.name}</Text>
+                    <Text style={styles.itemDescription}>{recipe.description}</Text>
+                    <View style={styles.itemMeta}>
+                      <Text style={styles.itemMetaText}>
+                        {recipe.ingredients.length} ingredientes
+                      </Text>
+                      <Text style={styles.itemMetaDot}>·</Text>
+                      <Text style={styles.itemMetaText}>{recipe.calories} kcal</Text>
+                    </View>
+                  </View>
+                  <ChevronRight size={20} color={palette.textDisabled} />
+                </Pressable>
+              </AnimatedEntry>
             );
           })}
         </View>
@@ -122,21 +132,23 @@ const styles = StyleSheet.create({
     borderRadius: radius.card,
     padding: spacing.md,
     gap: spacing.md,
+    borderWidth: 1,
+    borderColor: palette.border,
   },
-  itemSelected: { borderWidth: 2, borderColor: palette.primary },
+  itemSelected: { borderColor: palette.primary, borderWidth: 2 },
   itemPressed: { transform: [{ scale: 0.98 }] },
   itemEmoji: {
     width: 56,
     height: 56,
     borderRadius: 16,
-    backgroundColor: '#FFEDED',
+    backgroundColor: palette.primarySoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
   itemEmojiText: { fontSize: 28 },
-  itemName: { ...typography.bodyMedium, color: palette.textPrimary, fontWeight: '600' },
+  itemName: { ...typography.bodyMedium, color: palette.textPrimary, fontWeight: '700' },
   itemDescription: { ...typography.caption, color: palette.textSecondary, marginTop: 2 },
   itemMeta: { flexDirection: 'row', alignItems: 'center', marginTop: 6, gap: 6 },
-  itemMetaText: { ...typography.label, color: palette.textSecondary },
-  itemMetaDot: { ...typography.label, color: palette.textDisabled },
+  itemMetaText: { ...typography.caption, color: palette.textSecondary },
+  itemMetaDot: { ...typography.caption, color: palette.textDisabled },
 });

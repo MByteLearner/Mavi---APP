@@ -4,7 +4,7 @@ import { palette, radius, shadow, spacing } from '@/theme';
 
 export interface CardProps {
   children: ReactNode;
-  variant?: 'elevated' | 'flat' | 'outlined';
+  variant?: 'elevated' | 'flat' | 'outlined' | 'ghost';
   padding?: 'none' | 'sm' | 'md' | 'lg';
   style?: StyleProp<ViewStyle>;
   className?: string;
@@ -28,9 +28,15 @@ export function Card({
       ? styles.elevated
       : variant === 'outlined'
         ? styles.outlined
-        : styles.flat;
+        : variant === 'ghost'
+          ? styles.ghost
+          : styles.flat;
 
-  return <View style={[styles.base, baseStyle, { padding: paddingMap[padding] }, style]}>{children}</View>;
+  return (
+    <View style={[styles.base, baseStyle, { padding: paddingMap[padding] }, style]}>
+      {children}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -39,6 +45,8 @@ const styles = StyleSheet.create({
     borderRadius: radius.card,
   },
   elevated: {
+    borderWidth: 1,
+    borderColor: palette.border,
     ...shadow.sm,
   },
   flat: {
@@ -47,5 +55,8 @@ const styles = StyleSheet.create({
   outlined: {
     borderWidth: 1,
     borderColor: palette.border,
+  },
+  ghost: {
+    backgroundColor: 'transparent',
   },
 });

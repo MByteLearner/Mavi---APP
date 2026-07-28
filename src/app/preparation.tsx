@@ -247,6 +247,7 @@ const styles = StyleSheet.create({
     color: palette.textPrimary,
     fontWeight: '700',
     marginTop: spacing.xs,
+    fontFamily: 'Fraunces_500Medium',
   },
   weightCard: {
     alignItems: 'center',
@@ -256,10 +257,10 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
   weightNumber: {
-    fontSize: 110,
-    fontWeight: '700',
+    fontFamily: 'Fraunces_700Bold',
+    fontSize: 120,
     color: palette.textPrimary,
-    letterSpacing: -3,
+    letterSpacing: -4,
     fontVariant: ['tabular-nums'],
   },
   weightUnit: {

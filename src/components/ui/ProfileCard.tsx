@@ -59,14 +59,21 @@ export function ProfileCard({
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <View style={styles.stat}>
-      <Text style={styles.statValue}>{value}</Text>
+      <Text style={styles.statValue} numberOfLines={1} adjustsFontSizeToFit>
+        {value}
+      </Text>
       <Text style={styles.statLabel}>{label}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, marginBottom: spacing.lg },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    marginBottom: spacing.lg,
+  },
   avatar: {
     width: 64,
     height: 64,
@@ -94,17 +101,32 @@ const styles = StyleSheet.create({
   streakLabel: { ...typography.label, color: palette.primary, marginTop: -2 },
   statsRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingTop: spacing.md,
+    flexWrap: 'wrap',
+    rowGap: spacing.lg,
+    columnGap: spacing.lg,
+    paddingTop: spacing.lg,
     borderTopWidth: 1,
     borderTopColor: palette.divider,
   },
-  stat: { alignItems: 'center' },
+  stat: {
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: '22%',
+    minWidth: 64,
+    alignItems: 'flex-start',
+    paddingRight: spacing.sm,
+  },
   statValue: {
     ...typography.bodyMedium,
     color: palette.textPrimary,
     fontWeight: '600',
     fontVariant: ['tabular-nums'],
   },
-  statLabel: { ...typography.label, color: palette.textSecondary, marginTop: 2 },
+  statLabel: {
+    ...typography.label,
+    color: palette.textSecondary,
+    marginTop: 6,
+    textTransform: 'uppercase',
+    letterSpacing: 0.4,
+  },
 });

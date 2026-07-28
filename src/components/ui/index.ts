@@ -12,8 +12,10 @@ export { Input } from './Input';
 export type { InputProps } from './Input';
 export { ScreenHeader } from './ScreenHeader';
 export type { ScreenHeaderProps } from './ScreenHeader';
+export { Hero } from './Hero';
+export type { HeroProps } from './Hero';
 export { EmptyState } from './EmptyState';
-export type { EmptyStateProps } from './EmptyState';
+export type { EmptyStateProps, EmptyStateIllustration } from './EmptyState';
 export { ErrorState } from './ErrorState';
 export type { ErrorStateProps } from './ErrorState';
 export { Loading } from './Loading';
@@ -36,5 +38,16 @@ export { GoalCard } from './GoalCard';
 export type { GoalCardProps } from './GoalCard';
 export { ProfileCard } from './ProfileCard';
 export type { ProfileCardProps } from './ProfileCard';
+export { AnimatedEntry } from './AnimatedEntry';
+export type { AnimatedEntryProps } from './AnimatedEntry';
+export {
+  IllustrationPlan,
+  IllustrationRecipe,
+  IllustrationHistory,
+  IllustrationProfile,
+  IllustrationChat,
+  IllustrationError,
+  IllustrationSparkle,
+} from './Illustrations';
 export { ToastContainer, toast, useToastStore } from './Toast';
 export type { ToastTone, ToastItem } from './Toast';
