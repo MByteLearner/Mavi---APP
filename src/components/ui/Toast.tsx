@@ -29,7 +29,15 @@ export const useToastStore = create<ToastState>((set) => ({
   toasts: [],
   show: (message, tone = 'info', durationMs = 2800) => {
     const id = `t-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-    set((state) => ({ toasts: [...state.toasts, { id, message, tone, durationMs }] }));
+    set((state) => {
+      // If last toast has identical message, don't duplicate
+      if (state.toasts.length > 0 && state.toasts[state.toasts.length - 1].message === message) {
+        return state;
+      }
+      // Max 2 toasts stacked at a time to prevent clogging the screen
+      const trimmed = state.toasts.length >= 2 ? state.toasts.slice(1) : state.toasts;
+      return { toasts: [...trimmed, { id, message, tone, durationMs }] };
+    });
   },
   dismiss: (id) =>
     set((state) => ({ toasts: state.toasts.filter((t) => t.id !== id) })),

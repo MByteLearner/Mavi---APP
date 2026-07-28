@@ -1,5 +1,5 @@
 import { Text, View, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
-import { palette, radius, typography } from '@/theme';
+import { radius, typography, useThemeColors } from '@/theme';
 
 export type ChipTone = 'neutral' | 'brand' | 'success' | 'warning' | 'error' | 'info';
 
@@ -10,16 +10,18 @@ export interface ChipProps {
   style?: StyleProp<ViewStyle>;
 }
 
-const toneStyles: Record<ChipTone, { bg: string; text: string }> = {
-  neutral: { bg: palette.divider, text: palette.textPrimary },
-  brand: { bg: '#FFEDED', text: palette.primary },
-  success: { bg: '#E8F5E9', text: palette.success },
-  warning: { bg: '#FFF8E1', text: palette.warning },
-  error: { bg: '#FFEBEE', text: palette.error },
-  info: { bg: '#E3F2FD', text: palette.info },
-};
-
 export function Chip({ label, tone = 'neutral', icon, style }: ChipProps) {
+  const colors = useThemeColors();
+
+  const toneStyles: Record<ChipTone, { bg: string; text: string }> = {
+    neutral: { bg: colors.divider, text: colors.textPrimary },
+    brand: { bg: colors.primarySoft, text: colors.primary },
+    success: { bg: colors.successSoft, text: colors.success },
+    warning: { bg: colors.warningSoft, text: colors.warning },
+    error: { bg: colors.errorSoft, text: colors.error },
+    info: { bg: colors.infoSoft, text: colors.info },
+  };
+
   const t = toneStyles[tone];
   return (
     <View style={[styles.chip, { backgroundColor: t.bg }, style]}>

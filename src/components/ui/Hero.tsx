@@ -1,6 +1,6 @@
 import { Text, View, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
 import type { ReactNode } from 'react';
-import { palette, spacing, typography } from '@/theme';
+import { spacing, typography, useThemeColors } from '@/theme';
 
 export interface HeroProps {
   eyebrow?: string;
@@ -22,21 +22,23 @@ export function Hero({
   align = 'left',
   style,
 }: HeroProps) {
+  const colors = useThemeColors();
   const tokens = title.split(/(\s+)/);
+
   return (
     <View style={[styles.wrapper, style, align === 'center' && styles.center]}>
       {eyebrow ? (
-        <Text style={[styles.eyebrow, align === 'center' && styles.centerText]}>
+        <Text style={[styles.eyebrow, { color: colors.primary }, align === 'center' && styles.centerText]}>
           {eyebrow}
         </Text>
       ) : null}
-      <Text style={[styles.title, align === 'center' && styles.centerText]}>
+      <Text style={[styles.title, { color: colors.textPrimary }, align === 'center' && styles.centerText]}>
         {tokens.map((token, i) => {
           const isAccent = accentWords.includes(token);
           return (
             <Text
               key={i}
-              style={isAccent ? styles.accent : undefined}
+              style={isAccent ? [styles.accent, { color: colors.primary }] : undefined}
             >
               {token}
             </Text>
@@ -44,7 +46,7 @@ export function Hero({
         })}
       </Text>
       {subtitle ? (
-        <Text style={[styles.subtitle, align === 'center' && styles.centerText]}>
+        <Text style={[styles.subtitle, { color: colors.textSecondary }, align === 'center' && styles.centerText]}>
           {subtitle}
         </Text>
       ) : null}
@@ -60,20 +62,16 @@ const styles = StyleSheet.create({
   center: { alignItems: 'center' },
   eyebrow: {
     ...typography.overline,
-    color: palette.primary,
     marginBottom: spacing.sm,
   },
   title: {
     ...typography.display,
-    color: palette.textPrimary,
   },
   accent: {
-    color: palette.primary,
     fontStyle: 'italic',
   },
   subtitle: {
     ...typography.bodySecondary,
-    color: palette.textSecondary,
     marginTop: spacing.md,
     maxWidth: 480,
   },

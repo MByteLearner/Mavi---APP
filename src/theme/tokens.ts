@@ -1,35 +1,120 @@
-export const palette = {
-  // Light
-  primary: '#E53935',
-  primaryDark: '#C62828',
-  primarySoft: '#FFEDED',
-  secondary: '#D4AF37',
-  secondarySoft: '#FAEFD0',
-  success: '#4CAF50',
-  successSoft: '#E8F5E9',
-  warning: '#FFB300',
-  warningSoft: '#FFF8E1',
-  error: '#EF5350',
-  errorSoft: '#FFEBEE',
-  info: '#2196F3',
-  infoSoft: '#E3F2FD',
-  background: '#FAFAFA',
+import { useThemeStore } from '@/stores/useThemeStore';
+
+export interface PaletteColors {
+  primary: string;
+  primaryDark: string;
+  primarySoft: string;
+  primaryMint: string;
+  secondary: string;
+  secondarySoft: string;
+  secondaryDark: string;
+  success: string;
+  successSoft: string;
+  warning: string;
+  warningSoft: string;
+  error: string;
+  errorSoft: string;
+  info: string;
+  infoSoft: string;
+  background: string;
+  surface: string;
+  surfaceAlt: string;
+  textPrimary: string;
+  textSecondary: string;
+  textDisabled: string;
+  textInverse: string;
+  border: string;
+  divider: string;
+  overlay: string;
+  darkBackground: string;
+  darkSurface: string;
+  darkSurfaceAlt: string;
+  darkText: string;
+  darkTextSecondary: string;
+  darkBorder: string;
+}
+
+export const lightPalette: PaletteColors = {
+  primary: '#2E7D32',
+  primaryDark: '#1B5E20',
+  primarySoft: '#E8F5E9',
+  primaryMint: '#A5D6A7',
+
+  secondary: '#FF9800',
+  secondarySoft: '#FFF3E0',
+  secondaryDark: '#E65100',
+
+  success: '#10B981',
+  successSoft: '#D1FAE5',
+  warning: '#F59E0B',
+  warningSoft: '#FEF3C7',
+  error: '#EF4444',
+  errorSoft: '#FEE2E2',
+  info: '#3B82F6',
+  infoSoft: '#EFF6FF',
+
+  background: '#F9FAFB',
   surface: '#FFFFFF',
+  surfaceAlt: '#F5F5F5',
+
   textPrimary: '#212121',
-  textSecondary: '#616161',
-  textDisabled: '#9E9E9E',
+  textSecondary: '#757575',
+  textDisabled: '#BDBDBD',
   textInverse: '#FFFFFF',
-  border: '#EEEEEE',
-  divider: '#F5F5F5',
+
+  border: '#E5E7EB',
+  divider: '#F3F4F6',
   overlay: 'rgba(0,0,0,0.4)',
-  // Dark mode (used in components, not in palette.light/dark tokens)
+
   darkBackground: '#0E0E0E',
   darkSurface: '#1A1A1A',
   darkSurfaceAlt: '#222222',
   darkText: '#F5F5F5',
   darkTextSecondary: '#A3A3A3',
   darkBorder: '#2A2A2A',
-} as const;
+};
+
+export const darkPalette: PaletteColors = {
+  ...lightPalette,
+  primary: '#4CAF50',
+  primaryDark: '#2E7D32',
+  primarySoft: '#1B381E',
+  primaryMint: '#81C784',
+
+  secondary: '#FFB74D',
+  secondarySoft: '#3E2723',
+  secondaryDark: '#F57C00',
+
+  background: '#0E0E0E',
+  surface: '#1A1A1A',
+  surfaceAlt: '#242424',
+
+  textPrimary: '#F5F5F5',
+  textSecondary: '#A3A3A3',
+  textDisabled: '#616161',
+  textInverse: '#1A1A1A',
+
+  border: '#2A2A2A',
+  divider: '#222222',
+  overlay: 'rgba(0,0,0,0.7)',
+};
+
+/**
+ * Proxy object for backwards compatibility.
+ * Evaluates palette tokens dynamically based on current useThemeStore state.
+ */
+export const palette: PaletteColors = new Proxy({} as PaletteColors, {
+  get(_target, prop: keyof PaletteColors) {
+    const resolved = useThemeStore.getState().resolved;
+    const current = resolved === 'dark' ? darkPalette : lightPalette;
+    return current[prop];
+  },
+});
+
+export function useThemeColors(): PaletteColors {
+  const resolved = useThemeStore((s) => s.resolved);
+  return resolved === 'dark' ? darkPalette : lightPalette;
+}
 
 export const spacing = {
   xs: 4,
@@ -45,6 +130,7 @@ export const radius = {
   sm: 8,
   md: 12,
   lg: 16,
+  xl: 20,
   button: 18,
   card: 20,
   bottomSheet: 28,
@@ -53,11 +139,9 @@ export const radius = {
 } as const;
 
 export const typography = {
-  // Display: Fraunces serif (editorial, characterful)
   display: { fontFamily: 'Fraunces_700Bold', fontSize: 40, lineHeight: 44, letterSpacing: -1 },
   displaySoft: { fontFamily: 'Fraunces_500Medium', fontSize: 40, lineHeight: 44, letterSpacing: -0.8 },
   serif: { fontFamily: 'Fraunces_400Regular', fontSize: 18, lineHeight: 28 },
-  // UI: Geist sans (clean, modern)
   title: { fontFamily: 'Geist_700Bold', fontSize: 28, lineHeight: 34, letterSpacing: -0.3 },
   titleSecondary: { fontFamily: 'Geist_600SemiBold', fontSize: 22, lineHeight: 28 },
   heading: { fontFamily: 'Geist_600SemiBold', fontSize: 18, lineHeight: 24 },
@@ -87,11 +171,18 @@ export const shadow = {
     elevation: 6,
   },
   lg: {
-    shadowColor: '#E53935',
+    shadowColor: '#2E7D32',
     shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.15,
+    shadowOpacity: 0.2,
     shadowRadius: 32,
     elevation: 8,
+  },
+  orange: {
+    shadowColor: '#FF9800',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 16,
+    elevation: 6,
   },
 } as const;
 

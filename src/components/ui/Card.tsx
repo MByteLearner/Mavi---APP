@@ -1,6 +1,6 @@
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import type { ReactNode } from 'react';
-import { palette, radius, shadow, spacing } from '@/theme';
+import { radius, shadow, spacing, useThemeColors } from '@/theme';
 
 export interface CardProps {
   children: ReactNode;
@@ -23,40 +23,42 @@ export function Card({
   padding = 'md',
   style,
 }: CardProps) {
+  const colors = useThemeColors();
+
+  const dynamicStyles = {
+    base: {
+      backgroundColor: colors.surface,
+      borderRadius: radius.card,
+    },
+    elevated: {
+      borderWidth: 1,
+      borderColor: colors.border,
+      ...shadow.sm,
+    },
+    flat: {
+      backgroundColor: colors.background,
+    },
+    outlined: {
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    ghost: {
+      backgroundColor: 'transparent',
+    },
+  };
+
   const baseStyle =
     variant === 'elevated'
-      ? styles.elevated
+      ? dynamicStyles.elevated
       : variant === 'outlined'
-        ? styles.outlined
+        ? dynamicStyles.outlined
         : variant === 'ghost'
-          ? styles.ghost
-          : styles.flat;
+          ? dynamicStyles.ghost
+          : dynamicStyles.flat;
 
   return (
-    <View style={[styles.base, baseStyle, { padding: paddingMap[padding] }, style]}>
+    <View style={[dynamicStyles.base, baseStyle, { padding: paddingMap[padding] }, style]}>
       {children}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  base: {
-    backgroundColor: palette.surface,
-    borderRadius: radius.card,
-  },
-  elevated: {
-    borderWidth: 1,
-    borderColor: palette.border,
-    ...shadow.sm,
-  },
-  flat: {
-    backgroundColor: palette.background,
-  },
-  outlined: {
-    borderWidth: 1,
-    borderColor: palette.border,
-  },
-  ghost: {
-    backgroundColor: 'transparent',
-  },
-});

@@ -21,7 +21,10 @@ import {
   Geist_700Bold,
 } from '@expo-google-fonts/geist';
 
+import { useRouter, useSegments } from 'expo-router';
+
 import { ToastContainer } from '@/components/ui/Toast';
+import { useAuthStore } from '@/stores/useAuthStore';
 import { palette, typography } from '@/theme';
 import { logger } from '@/utils/logger';
 
@@ -63,7 +66,33 @@ class ErrorBoundary extends Component<
   }
 }
 
+function AuthGuard({ children }: { children: React.ReactNode }) {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const hasHydrated = useAuthStore((s) => s._hasHydrated);
+  const segments = useSegments();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!hasHydrated) return;
+
+    const inAuthGroup = segments[0] === '(auth)';
+
+    if (!isAuthenticated && !inAuthGroup) {
+      router.replace('/(auth)/login');
+    } else if (isAuthenticated && inAuthGroup) {
+      router.replace('/(tabs)');
+    }
+  }, [isAuthenticated, hasHydrated, segments, router]);
+
+  return <>{children}</>;
+}
+
+import { useThemeStore } from '@/stores/useThemeStore';
+
 export default function RootLayout() {
+  const resolved = useThemeStore((s) => s.resolved);
+  const isDarkMode = resolved === 'dark';
+
   const [fontsLoaded] = useFonts({
     Fraunces_400Regular,
     Fraunces_500Medium,
@@ -86,17 +115,20 @@ export default function RootLayout() {
 
   if (!fontsLoaded) return null;
 
+  const bgColor = isDarkMode ? palette.darkBackground : palette.background;
+
   return (
-    <GestureHandlerRootView style={styles.root}>
+    <GestureHandlerRootView style={[styles.root, { backgroundColor: bgColor }]}>
       <SafeAreaProvider>
         <ErrorBoundary>
           <QueryClientProvider client={queryClient}>
-            <View style={styles.root}>
-              <StatusBar style="dark" />
+            <View style={[styles.root, { backgroundColor: bgColor }]}>
+              <StatusBar style={isDarkMode ? 'light' : 'dark'} />
+              <AuthGuard>
               <Stack
                 screenOptions={{
                   headerShown: false,
-                  contentStyle: { backgroundColor: palette.background },
+                  contentStyle: { backgroundColor: bgColor },
                 }}
               >
                 <Stack.Screen name="(auth)" />
@@ -114,6 +146,7 @@ export default function RootLayout() {
                   options={{ presentation: 'fullScreenModal', animation: 'slide_from_bottom' }}
                 />
               </Stack>
+              </AuthGuard>
               <ToastContainer />
             </View>
           </QueryClientProvider>

@@ -1,5 +1,5 @@
 import { Text, TextInput, View, StyleSheet, type TextInputProps } from 'react-native';
-import { palette, radius, typography } from '@/theme';
+import { radius, typography, useThemeColors } from '@/theme';
 import type { ReactNode } from 'react';
 
 export interface InputProps extends Omit<TextInputProps, 'style'> {
@@ -11,23 +11,25 @@ export interface InputProps extends Omit<TextInputProps, 'style'> {
 }
 
 export function Input({ label, error, hint, leftIcon, rightIcon, ...rest }: InputProps) {
-  const borderColor = error ? palette.error : palette.border;
+  const colors = useThemeColors();
+  const borderColor = error ? colors.error : colors.border;
+
   return (
     <View style={styles.wrapper}>
-      {label ? <Text style={styles.label}>{label}</Text> : null}
-      <View style={[styles.field, { borderColor }]}>
+      {label ? <Text style={[styles.label, { color: colors.textSecondary }]}>{label}</Text> : null}
+      <View style={[styles.field, { borderColor, backgroundColor: colors.surface }]}>
         {leftIcon ? <View style={styles.leftIcon}>{leftIcon}</View> : null}
         <TextInput
-          style={styles.input}
-          placeholderTextColor={palette.textDisabled}
+          style={[styles.input, { color: colors.textPrimary }]}
+          placeholderTextColor={colors.textDisabled}
           {...rest}
         />
         {rightIcon ? <View style={styles.rightIcon}>{rightIcon}</View> : null}
       </View>
       {error ? (
-        <Text style={[styles.helper, { color: palette.error }]}>{error}</Text>
+        <Text style={[styles.helper, { color: colors.error }]}>{error}</Text>
       ) : hint ? (
-        <Text style={styles.helper}>{hint}</Text>
+        <Text style={[styles.helper, { color: colors.textSecondary }]}>{hint}</Text>
       ) : null}
     </View>
   );
@@ -37,7 +39,6 @@ const styles = StyleSheet.create({
   wrapper: { gap: 6 },
   label: {
     ...typography.label,
-    color: palette.textSecondary,
     fontWeight: '600',
   },
   field: {
@@ -47,17 +48,14 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     borderWidth: 1.5,
     paddingHorizontal: 16,
-    backgroundColor: palette.surface,
   },
   input: {
     flex: 1,
     ...typography.body,
-    color: palette.textPrimary,
   },
   leftIcon: { marginRight: 8 },
   rightIcon: { marginLeft: 8 },
   helper: {
     ...typography.caption,
-    color: palette.textSecondary,
   },
 });

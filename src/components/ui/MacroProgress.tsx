@@ -1,5 +1,5 @@
 import { Text, View, StyleSheet } from 'react-native';
-import { palette, spacing, typography } from '@/theme';
+import { spacing, typography, useThemeColors } from '@/theme';
 
 export interface MacroProgressProps {
   label: string;
@@ -10,17 +10,19 @@ export interface MacroProgressProps {
 }
 
 export function MacroProgress({ label, current, target, color, unit = 'g' }: MacroProgressProps) {
+  const colors = useThemeColors();
   const pct = Math.min(current / Math.max(target, 1), 1);
+
   return (
     <View style={styles.wrapper}>
       <View style={styles.headerRow}>
-        <Text style={styles.label}>{label}</Text>
-        <Text style={styles.value}>
+        <Text style={[styles.label, { color: colors.textPrimary }]}>{label}</Text>
+        <Text style={[styles.value, { color: colors.textPrimary }]}>
           {current}
-          <Text style={styles.valueMuted}> / {target}{unit}</Text>
+          <Text style={[styles.valueMuted, { color: colors.textSecondary }]}> / {target}{unit}</Text>
         </Text>
       </View>
-      <View style={styles.track}>
+      <View style={[styles.track, { backgroundColor: colors.divider }]}>
         <View
           style={[
             styles.fill,
@@ -41,20 +43,16 @@ const styles = StyleSheet.create({
   },
   label: {
     ...typography.bodyMedium,
-    color: palette.textPrimary,
   },
   value: {
     ...typography.bodyMedium,
-    color: palette.textPrimary,
     fontVariant: ['tabular-nums'],
   },
   valueMuted: {
-    color: palette.textSecondary,
     fontWeight: '400',
   },
   track: {
     height: 8,
-    backgroundColor: palette.divider,
     borderRadius: 4,
     overflow: 'hidden',
   },

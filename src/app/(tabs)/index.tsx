@@ -4,14 +4,12 @@ import { router } from 'expo-router';
 
 import { useUserStore } from '@/stores/useUserStore';
 import { useSessionStore } from '@/stores/useSessionStore';
+import { useAuthStore } from '@/stores/useAuthStore';
 import {
   CaloriesRing,
   MacroProgress,
   AIRecommendationCard,
   FoodCard,
-  Avatar,
-  Chip,
-  Hero,
   AnimatedEntry,
 } from '@/components/ui';
 import {
@@ -22,108 +20,143 @@ import {
   Water,
   Target,
   Scale,
+  Leaf,
+  BookOpen,
 } from '@/components/ui/icons';
 import { palette, radius, shadow, spacing, typography } from '@/theme';
 
+import { useThemeColors } from '@/theme';
+
 export default function HomeScreen() {
+  const colors = useThemeColors();
   const streak = useUserStore((state) => state.streak);
   const hasActiveRecipe = useSessionStore((state) => state.activeRecipeId !== null);
+  const user = useAuthStore((s) => s.user);
+  const userName = user?.name?.split(' ')[0] ?? 'Usuario';
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top']}>
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
+        {/* ── Header ── */}
         <AnimatedEntry delay={0}>
           <View style={styles.appBar}>
             <View style={styles.appBarLeft}>
-              <Avatar name="María García" size="md" />
+              {/* Logo MAVI */}
+              <View style={[styles.logoMark, { backgroundColor: colors.primary }]}>
+                <Leaf size={20} color={colors.textInverse} />
+              </View>
               <View>
-                <Text style={styles.eyebrow}>Hoy</Text>
-                <Text style={styles.appBarGreeting}>María García</Text>
+                <Text style={[styles.greeting, { color: colors.textPrimary }]}>Hola, {userName} 👋</Text>
+                <Text style={[styles.subGreeting, { color: colors.textSecondary }]}>¿Listo para comer bien hoy?</Text>
               </View>
             </View>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Notificaciones"
-              style={styles.bell}
-            >
-              <View style={styles.bellDot} />
+            {/* Racha — naranja cálido */}
+            <Pressable style={[styles.streakBadge, { backgroundColor: colors.secondarySoft, borderColor: colors.secondary + '44' }]} accessibilityLabel={`Racha de ${streak} días`}>
+              <Flame size={14} color={colors.secondary} />
+              <Text style={[styles.streakText, { color: colors.secondaryDark }]}>{streak} días</Text>
             </Pressable>
           </View>
         </AnimatedEntry>
 
+        {/* ── Acciones principales — Tarjetas grandes ── */}
         <AnimatedEntry delay={80}>
-          <View style={styles.streakRow}>
-            <Chip
-              tone="brand"
-              icon={<Flame size={14} color={palette.primary} />}
-              label={`${streak} días de racha`}
-            />
-            <Chip label="Plan activo" tone="success" />
+          <View style={styles.heroCards}>
+            {/* Tarjeta Escanear Plan */}
+            <Pressable
+              style={[styles.heroCard, { backgroundColor: colors.primary }, shadow.lg]}
+              onPress={() => router.push('/scan')}
+              accessibilityRole="button"
+              accessibilityLabel="Escanear plan médico"
+            >
+              <View style={styles.heroCardIconWrapper}>
+                <ScanLine size={28} color={colors.textInverse} />
+              </View>
+              <Text style={[styles.heroCardTitle, { color: colors.textInverse }]}>Escanear{'\n'}Plan Médico</Text>
+              <Text style={styles.heroCardSub}>Subí tu dieta en PDF o foto</Text>
+              <View style={styles.heroCardArrow}>
+                <ChevronRight size={16} color="rgba(255,255,255,0.7)" />
+              </View>
+            </Pressable>
+
+            {/* Tarjeta Receta */}
+            <Pressable
+              style={[styles.heroCard, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1.5 }, shadow.sm]}
+              onPress={() => router.push('/(tabs)/nutrition')}
+              accessibilityRole="button"
+              accessibilityLabel={hasActiveRecipe ? 'Continuar receta' : 'Nueva receta'}
+            >
+              <View style={[styles.heroCardIconWrapper, { backgroundColor: colors.primarySoft }]}>
+                <BookOpen size={28} color={colors.primary} />
+              </View>
+              <Text style={[styles.heroCardTitle, { color: colors.textPrimary }]}>
+                {hasActiveRecipe ? 'Continuar\nReceta' : 'Nueva\nReceta'}
+              </Text>
+              <Text style={[styles.heroCardSub, { color: colors.textSecondary }]}>
+                {hasActiveRecipe ? 'Volvé a tu preparación' : 'Elegí una receta de tu plan'}
+              </Text>
+              <View style={styles.heroCardArrow}>
+                <ChevronRight size={16} color={colors.textSecondary} />
+              </View>
+            </Pressable>
           </View>
         </AnimatedEntry>
 
+        {/* ── Estadísticas rápidas ── */}
         <AnimatedEntry delay={160}>
-          <Hero
-            eyebrow="Hoy"
-            title="Tu día se ve así"
-            accentWords={["así"]}
-            subtitle="Llevás 1.450 kcal de 2.200. Mantené el ritmo."
-          />
+          <View style={styles.statsRow}>
+            <View style={[styles.statCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+              <View style={[styles.statIcon, { backgroundColor: colors.infoSoft }]}>
+                <Water size={20} color={colors.info} />
+              </View>
+              <Text style={[styles.statValue, { color: colors.textPrimary }]}>5/8</Text>
+              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Agua</Text>
+            </View>
+            <View style={[styles.statCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+              <View style={[styles.statIcon, { backgroundColor: colors.successSoft }]}>
+                <Scale size={20} color={colors.success} />
+              </View>
+              <Text style={[styles.statValue, { color: colors.textPrimary }]}>68.4</Text>
+              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Peso kg</Text>
+            </View>
+            <View style={[styles.statCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+              <View style={[styles.statIcon, { backgroundColor: colors.secondarySoft }]}>
+                <Target size={20} color={colors.secondary} />
+              </View>
+              <Text style={[styles.statValue, { color: colors.textPrimary }]}>3/5</Text>
+              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Metas</Text>
+            </View>
+          </View>
         </AnimatedEntry>
 
+        {/* ── Calorías del día ── */}
         <AnimatedEntry delay={240}>
-          <View style={styles.ringCard}>
+          <View style={[styles.ringCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <View style={styles.ringCardHeader}>
-              <Text style={styles.ringTitle}>Calorías</Text>
-              <Text style={styles.ringSub}>Objetivo · 2.200 kcal</Text>
+              <Text style={[styles.ringTitle, { color: colors.textPrimary }]}>Calorías de hoy</Text>
+              <Text style={[styles.ringSub, { color: colors.textSecondary }]}>Objetivo · 2.200 kcal</Text>
             </View>
             <View style={styles.ringBody}>
               <CaloriesRing consumed={1450} target={2200} size={200} />
             </View>
-            <View style={styles.macroDivider} />
+            <View style={[styles.macroDivider, { backgroundColor: colors.divider }]} />
             <View style={styles.macrosRow}>
-              <MacroProgress label="Proteínas" current={85} target={140} color={palette.primary} unit="g" />
-              <MacroProgress label="Carbohidratos" current={160} target={240} color={palette.secondary} unit="g" />
-              <MacroProgress label="Grasas" current={45} target={70} color={palette.info} unit="g" />
+              <MacroProgress label="Proteínas" current={85} target={140} color={colors.primary} unit="g" />
+              <MacroProgress label="Carbohidratos" current={160} target={240} color={colors.secondary} unit="g" />
+              <MacroProgress label="Grasas" current={45} target={70} color={colors.info} unit="g" />
             </View>
           </View>
         </AnimatedEntry>
 
+        {/* ── Recomendaciones IA ── */}
         <AnimatedEntry delay={320}>
-          <View style={styles.statsRow}>
-            <View style={styles.statCard}>
-              <View style={[styles.statIcon, { backgroundColor: palette.infoSoft }]}>
-                <Water size={20} color={palette.info} />
-              </View>
-              <Text style={styles.statValue}>5/8</Text>
-              <Text style={styles.statLabel}>Agua</Text>
-            </View>
-            <View style={styles.statCard}>
-              <View style={[styles.statIcon, { backgroundColor: palette.successSoft }]}>
-                <Scale size={20} color={palette.success} />
-              </View>
-              <Text style={styles.statValue}>68.4</Text>
-              <Text style={styles.statLabel}>Peso kg</Text>
-            </View>
-            <View style={styles.statCard}>
-              <View style={[styles.statIcon, { backgroundColor: palette.warningSoft }]}>
-                <Target size={20} color={palette.warning} />
-              </View>
-              <Text style={styles.statValue}>3/5</Text>
-              <Text style={styles.statLabel}>Metas</Text>
-            </View>
-          </View>
-        </AnimatedEntry>
-
-        <AnimatedEntry delay={400}>
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Para vos</Text>
-              <Pressable hitSlop={8}>
-                <Text style={styles.sectionAction}>Ver todo</Text>
+              <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Para vos hoy</Text>
+              <Pressable hitSlop={8} onPress={() => router.push('/(tabs)/ia')}>
+                <Text style={[styles.sectionAction, { color: colors.primary }]}>Chat con IA</Text>
               </Pressable>
             </View>
             <View style={{ gap: spacing.md }}>
@@ -141,132 +174,166 @@ export default function HomeScreen() {
           </View>
         </AnimatedEntry>
 
-        <AnimatedEntry delay={480}>
+        {/* ── Últimas comidas ── */}
+        <AnimatedEntry delay={400}>
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Últimas comidas</Text>
-              <Pressable hitSlop={8}>
-                <Text style={styles.sectionAction}>Historial</Text>
+              <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Últimas comidas</Text>
+              <Pressable hitSlop={8} onPress={() => router.push('/(tabs)/history')}>
+                <Text style={[styles.sectionAction, { color: colors.primary }]}>Progreso</Text>
               </Pressable>
             </View>
             <View style={{ gap: spacing.sm }}>
               <FoodCard
                 title="Avena con manzana"
-                subtitle="Desayuno · 14:00"
+                subtitle="Desayuno · 08:00"
                 calories={320}
                 time="Hoy"
                 emoji="🥣"
               />
               <FoodCard
                 title="Pollo a la plancha"
-                subtitle="Almuerzo · 20:30"
+                subtitle="Almuerzo · 13:30"
                 calories={450}
-                time="Ayer"
+                time="Hoy"
                 emoji="🍗"
               />
             </View>
           </View>
         </AnimatedEntry>
-
-        <AnimatedEntry delay={560}>
-          <View style={styles.actionsRow}>
-            <Pressable
-              style={[styles.actionBtn, styles.actionPrimary]}
-              onPress={() => router.push('/scan')}
-            >
-              <View style={styles.actionIcon}>
-                <ScanLine size={20} color={palette.textInverse} />
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.actionTitle}>Escanear plan</Text>
-                <Text style={styles.actionSubtitle}>Subí tu dieta médica</Text>
-              </View>
-              <ChevronRight size={20} color={palette.textInverse} />
-            </Pressable>
-
-            <Pressable
-              style={styles.actionBtn}
-              onPress={() => router.push('/(tabs)/nutrition')}
-            >
-              <View style={[styles.actionIcon, { backgroundColor: palette.primarySoft }]}>
-                <Plus size={20} color={palette.primary} />
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={[styles.actionTitle, { color: palette.textPrimary }]}>
-                  {hasActiveRecipe ? 'Continuar receta' : 'Nueva receta'}
-                </Text>
-                <Text style={[styles.actionSubtitle, { color: palette.textSecondary }]}>
-                  {hasActiveRecipe ? 'Volvé a tu preparación' : 'Elegí una receta'}
-                </Text>
-              </View>
-              <ChevronRight size={20} color={palette.textSecondary} />
-            </Pressable>
-          </View>
-        </AnimatedEntry>
       </ScrollView>
+
+      {/* ── FAB Naranja — Acción secundaria ── */}
+      <Pressable
+        style={[styles.fab, { backgroundColor: colors.secondary }]}
+        onPress={() => router.push('/scan')}
+        accessibilityRole="button"
+        accessibilityLabel="Escanear plan"
+      >
+        <Plus size={28} color={palette.textInverse} />
+      </Pressable>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: palette.background },
-  content: { paddingHorizontal: spacing.lg, paddingBottom: spacing['2xl'] },
+  content: {
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing['2xl'] + 110, // espacio para el glass tab bar flotante
+  },
+
+  // ── App Bar ──
   appBar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: spacing.md,
+    marginBottom: spacing.sm,
   },
   appBarLeft: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
-  eyebrow: { ...typography.overline, color: palette.textSecondary, marginBottom: 2 },
-  appBarGreeting: { ...typography.bodyMedium, color: palette.textPrimary, fontFamily: 'Fraunces_500Medium', fontSize: 18 },
-  bell: {
+  logoMark: {
     width: 44,
     height: 44,
-    borderRadius: 22,
-    backgroundColor: palette.surface,
-    borderWidth: 1,
-    borderColor: palette.border,
+    borderRadius: 14,
+    backgroundColor: palette.primary,
     alignItems: 'center',
     justifyContent: 'center',
+    ...shadow.sm,
+  },
+  greeting: {
+    ...typography.bodyMedium,
+    color: palette.textPrimary,
+    fontFamily: 'Fraunces_500Medium',
+    fontSize: 17,
+  },
+  subGreeting: {
+    ...typography.caption,
+    color: palette.textSecondary,
+    marginTop: 2,
+  },
+  streakBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: '#FFF3E0',
+    paddingHorizontal: spacing.md,
+    paddingVertical: 7,
+    borderRadius: radius.pill,
+    borderWidth: 1.5,
+    borderColor: '#FFE0B2',
+  },
+  streakText: {
+    ...typography.label,
+    color: '#E65100',
+    fontWeight: '700',
+    fontSize: 12,
+  },
+
+  // ── Hero Cards ──
+  heroCards: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    marginBottom: spacing.lg,
+    marginTop: spacing.xs,
+  },
+  heroCard: {
+    flex: 1,
+    borderRadius: radius.card,
+    padding: spacing.md,
+    minHeight: 160,
+    justifyContent: 'flex-end',
+    gap: 4,
+    overflow: 'hidden',
     position: 'relative',
   },
-  bellDot: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+  heroCardPrimary: {
     backgroundColor: palette.primary,
-    borderWidth: 2,
-    borderColor: palette.surface,
+    ...shadow.lg,
   },
-  streakRow: {
+  heroCardSecondary: {
+    backgroundColor: palette.surface,
+    borderWidth: 1.5,
+    borderColor: palette.border,
+    ...shadow.sm,
+  },
+  heroCardIconWrapper: {
+    position: 'absolute',
+    top: spacing.md,
+    right: spacing.md,
+    width: 48,
+    height: 48,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255,255,255,0.18)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  heroCardIconMint: {
+    backgroundColor: palette.primarySoft,
+  },
+  heroCardTitle: {
+    ...typography.subheading,
+    color: palette.textInverse,
+    fontFamily: 'Fraunces_700Bold',
+    fontSize: 17,
+    lineHeight: 22,
+    marginTop: 8,
+  },
+  heroCardSub: {
+    ...typography.caption,
+    color: 'rgba(255,255,255,0.75)',
+    marginBottom: 4,
+  },
+  heroCardArrow: {
+    alignSelf: 'flex-start',
+  },
+
+  // ── Stats ──
+  statsRow: {
     flexDirection: 'row',
     gap: spacing.sm,
     marginBottom: spacing.lg,
   },
-  ringCard: {
-    backgroundColor: palette.surface,
-    borderRadius: radius.card,
-    padding: spacing.xl,
-    marginBottom: spacing.lg,
-    borderWidth: 1,
-    borderColor: palette.border,
-    ...shadow.sm,
-  },
-  ringCardHeader: { marginBottom: spacing.lg },
-  ringTitle: { ...typography.titleSecondary, color: palette.textPrimary },
-  ringSub: { ...typography.caption, color: palette.textSecondary, marginTop: 4 },
-  ringBody: { alignItems: 'center', marginBottom: spacing.lg },
-  macroDivider: {
-    height: 1,
-    backgroundColor: palette.divider,
-    marginBottom: spacing.lg,
-  },
-  macrosRow: { gap: spacing.md },
-  statsRow: { flexDirection: 'row', gap: spacing.sm, marginBottom: spacing.lg },
   statCard: {
     flex: 1,
     backgroundColor: palette.surface,
@@ -276,6 +343,7 @@ const styles = StyleSheet.create({
     gap: 6,
     borderWidth: 1,
     borderColor: palette.border,
+    ...shadow.sm,
   },
   statIcon: {
     width: 36,
@@ -288,38 +356,64 @@ const styles = StyleSheet.create({
     ...typography.bodyMedium,
     color: palette.textPrimary,
     fontWeight: '700',
-    fontVariant: ['tabular-nums'],
   },
   statLabel: { ...typography.caption, color: palette.textSecondary },
-  section: { marginTop: spacing.lg, marginBottom: spacing.md },
+
+  // ── Calories Ring ──
+  ringCard: {
+    backgroundColor: palette.surface,
+    borderRadius: radius.card,
+    padding: spacing.xl,
+    marginBottom: spacing.lg,
+    borderWidth: 1,
+    borderColor: palette.border,
+    ...shadow.sm,
+  },
+  ringCardHeader: { marginBottom: spacing.lg },
+  ringTitle: {
+    ...typography.titleSecondary,
+    color: palette.textPrimary,
+    fontFamily: 'Fraunces_500Medium',
+  },
+  ringSub: { ...typography.caption, color: palette.textSecondary, marginTop: 4 },
+  ringBody: { alignItems: 'center', marginBottom: spacing.lg },
+  macroDivider: {
+    height: 1,
+    backgroundColor: palette.divider,
+    marginBottom: spacing.lg,
+  },
+  macrosRow: { gap: spacing.md },
+
+  // ── Sections ──
+  section: { marginTop: spacing.sm, marginBottom: spacing.md },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'baseline',
     justifyContent: 'space-between',
     marginBottom: spacing.md,
   },
-  sectionTitle: { ...typography.titleSecondary, color: palette.textPrimary, fontFamily: 'Fraunces_500Medium' },
-  sectionAction: { ...typography.bodyMedium, color: palette.primary, fontWeight: '600' },
-  actionsRow: { marginTop: spacing.md, gap: spacing.sm },
-  actionBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: palette.surface,
-    borderRadius: radius.card,
-    padding: spacing.md,
-    gap: spacing.md,
-    borderWidth: 1,
-    borderColor: palette.border,
+  sectionTitle: {
+    ...typography.titleSecondary,
+    color: palette.textPrimary,
+    fontFamily: 'Fraunces_500Medium',
   },
-  actionPrimary: { backgroundColor: palette.primary, borderColor: palette.primary },
-  actionIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 14,
-    backgroundColor: 'rgba(255,255,255,0.18)',
+  sectionAction: {
+    ...typography.bodyMedium,
+    color: palette.primary,
+    fontWeight: '600',
+  },
+
+  // ── FAB Naranja ──
+  fab: {
+    position: 'absolute',
+    bottom: spacing.xl + 80, // sobre el tab bar
+    right: spacing.lg,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: palette.secondary,
     alignItems: 'center',
     justifyContent: 'center',
+    ...shadow.orange,
   },
-  actionTitle: { ...typography.bodyMedium, color: palette.textInverse, fontWeight: '700' },
-  actionSubtitle: { ...typography.caption, color: 'rgba(255,255,255,0.85)', marginTop: 2 },
 });
