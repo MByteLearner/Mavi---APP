@@ -1,5 +1,5 @@
 import { Text, View, StyleSheet } from 'react-native';
-import { palette, typography } from '@/theme';
+import { typography, useThemeColors } from '@/theme';
 
 export interface CaloriesRingProps {
   consumed: number;
@@ -9,6 +9,7 @@ export interface CaloriesRingProps {
 }
 
 export function CaloriesRing({ consumed, target, size = 180, label = 'kcal' }: CaloriesRingProps) {
+  const colors = useThemeColors();
   const pct = Math.min(consumed / Math.max(target, 1), 1);
   const remaining = Math.max(target - consumed, 0);
 
@@ -21,7 +22,7 @@ export function CaloriesRing({ consumed, target, size = 180, label = 'kcal' }: C
             width: size,
             height: size,
             borderRadius: size / 2,
-            borderColor: palette.divider,
+            borderColor: colors.divider,
           },
         ]}
       />
@@ -32,18 +33,18 @@ export function CaloriesRing({ consumed, target, size = 180, label = 'kcal' }: C
             width: size,
             height: size,
             borderRadius: size / 2,
-            borderColor: palette.primary,
+            borderColor: colors.primary,
             borderTopColor: 'transparent',
-            borderRightColor: pct > 0.25 ? palette.primary : 'transparent',
-            borderBottomColor: pct > 0.5 ? palette.primary : 'transparent',
-            borderLeftColor: pct > 0.75 ? palette.primary : 'transparent',
+            borderRightColor: pct > 0.25 ? colors.primary : 'transparent',
+            borderBottomColor: pct > 0.5 ? colors.primary : 'transparent',
+            borderLeftColor: pct > 0.75 ? colors.primary : 'transparent',
             transform: [{ rotate: '-45deg' }],
           },
         ]}
       />
       <View style={styles.center}>
-        <Text style={[styles.value, { fontSize: size * 0.22 }]}>{remaining}</Text>
-        <Text style={[styles.label, { fontSize: size * 0.09 }]}>de {target} {label}</Text>
+        <Text style={[styles.value, { fontSize: size * 0.22, color: colors.textPrimary }]}>{remaining}</Text>
+        <Text style={[styles.label, { fontSize: size * 0.09, color: colors.textSecondary }]}>de {target} {label}</Text>
       </View>
     </View>
   );
@@ -62,12 +63,10 @@ const styles = StyleSheet.create({
   center: { alignItems: 'center' },
   value: {
     ...typography.title,
-    color: palette.textPrimary,
     fontWeight: '700',
   },
   label: {
     ...typography.caption,
-    color: palette.textSecondary,
     marginTop: 4,
   },
 });

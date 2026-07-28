@@ -1,145 +1,118 @@
 import { useState } from 'react';
-import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 
 import { useAuthStore } from '@/stores/useAuthStore';
-import { Button, Input, AnimatedEntry, LoadingOverlay } from '@/components/ui';
-import { Mail, Lock, Eye, EyeOff } from '@/components/ui/icons';
-import { palette, radius, shadow, spacing, typography } from '@/theme';
-import { useHaptics } from '@/hooks/useHaptics';
+import { Button, Input, Card, AnimatedEntry } from '@/components/ui';
+import { Leaf, Mail, Lock } from '@/components/ui/icons';
+import { radius, shadow, spacing, typography, useThemeColors } from '@/theme';
+import { toast } from '@/components/ui/Toast';
 
 export default function LoginScreen() {
+  const colors = useThemeColors();
   const login = useAuthStore((s) => s.login);
-  const haptics = useHaptics();
 
-  const [email, setEmail] = useState('maria.garcia@mavi.app');
-  const [password, setPassword] = useState('mavi2026');
-  const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState('demo@mavi.com');
+  const [password, setPassword] = useState('123456');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+
+  const validate = () => {
+    const errs: { email?: string; password?: string } = {};
+    if (!email.trim()) errs.email = 'El correo es requerido';
+    else if (!/\S+@\S+\.\S+/.test(email)) errs.email = 'Correo inválido';
+    if (!password) errs.password = 'La contraseña es requerida';
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
 
   const handleLogin = async () => {
-    setError(null);
+    if (!validate()) return;
     setLoading(true);
-    haptics.medium();
-
-    const result = await login(email, password);
-    setLoading(false);
-
-    if (result.success) {
-      haptics.success();
-      router.replace('/(tabs)');
-    } else {
-      haptics.error();
-      setError(result.message ?? 'Credenciales incorrectas');
+    try {
+      const ok = await login(email, password);
+      if (ok) {
+        toast.success('¡Bienvenido de nuevo!');
+        router.replace('/(tabs)');
+      } else {
+        toast.error('Credenciales incorrectas');
+      }
+    } catch {
+      toast.error('Error al iniciar sesión');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
-      <ScrollView
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-      >
-        <View style={styles.centerCard}>
-          <AnimatedEntry delay={0}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+        <AnimatedEntry>
+          <View style={styles.centerCard}>
             <View style={styles.brandBadgeWrapper}>
-              <View style={styles.brandLogo}>
-                <Text style={styles.brandLogoText}>✦</Text>
+              <View style={[styles.brandLogo, { backgroundColor: colors.primary }]}>
+                <Leaf size={28} color={colors.textInverse} />
               </View>
               <View style={styles.brandTextWrapper}>
-                <Text style={styles.brandTitle}>MAVI</Text>
-                <Text style={styles.brandTagline}>ASISTENTE DE NUTRICIÓN</Text>
+                <Text style={[styles.brandTitle, { color: colors.textPrimary }]}>MAVI</Text>
+                <Text style={[styles.brandSubtitle, { color: colors.textSecondary }]}>Asistente de Nutrición</Text>
               </View>
             </View>
-          </AnimatedEntry>
 
-          <AnimatedEntry delay={80}>
-            <View style={styles.heroBlock}>
-              <Text style={styles.heroTitle}>Bienvenido de nuevo</Text>
-              <Text style={styles.heroSubtitle}>
-                Ingresá a tu centro de control nutricional con visión robótica y precisión inteligente.
+            <Card variant="elevated" padding="lg" style={{ backgroundColor: colors.surface, borderColor: colors.border }}>
+              <View style={styles.form}>
+                <Text style={[styles.cardHeading, { color: colors.textPrimary }]}>Iniciar Sesión</Text>
+                <Text style={[styles.cardSubheading, { color: colors.textSecondary }]}>Ingresá tus credenciales para continuar</Text>
+
+                <Input
+                  label="Correo electrónico"
+                  placeholder="ejemplo@mavi.com"
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  error={errors.email}
+                  leftIcon={<Mail size={20} color={colors.textSecondary} />}
+                />
+
+                <Input
+                  label="Contraseña"
+                  placeholder="••••••••"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry
+                  error={errors.password}
+                  leftIcon={<Lock size={20} color={colors.textSecondary} />}
+                />
+
+                <Button
+                  label="Ingresar"
+                  onPress={handleLogin}
+                  loading={loading}
+                  style={{ marginTop: spacing.xs }}
+                />
+              </View>
+            </Card>
+
+            <View style={styles.footerRow}>
+              <Text style={[styles.footerText, { color: colors.textSecondary }]}>¿No tenés cuenta? </Text>
+              <Text
+                style={[styles.linkText, { color: colors.primary }]}
+                onPress={() => router.push('/(auth)/register')}
+              >
+                Registrate
               </Text>
             </View>
-          </AnimatedEntry>
-
-          <AnimatedEntry delay={160}>
-            <View style={styles.form}>
-              <Input
-                label="Correo electrónico"
-                placeholder="tu@email.com"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                value={email}
-                onChangeText={(t) => {
-                  setEmail(t);
-                  setError(null);
-                }}
-                leftIcon={<Mail size={20} color={palette.textSecondary} />}
-              />
-
-              <Input
-                label="Contraseña"
-                placeholder="••••••••"
-                secureTextEntry={!showPassword}
-                value={password}
-                onChangeText={(t) => {
-                  setPassword(t);
-                  setError(null);
-                }}
-                leftIcon={<Lock size={20} color={palette.textSecondary} />}
-                rightIcon={
-                  <Pressable onPress={() => setShowPassword(!showPassword)} hitSlop={8}>
-                    {showPassword ? (
-                      <EyeOff size={20} color={palette.textSecondary} />
-                    ) : (
-                      <Eye size={20} color={palette.textSecondary} />
-                    )}
-                  </Pressable>
-                }
-              />
-
-              {error ? (
-                <View style={styles.errorBanner}>
-                  <Text style={styles.errorText}>{error}</Text>
-                </View>
-              ) : null}
-
-              <Pressable style={styles.forgotBtn}>
-                <Text style={styles.forgotText}>¿Olvidaste tu contraseña?</Text>
-              </Pressable>
-
-              <Button
-                label="Iniciar sesión"
-                variant="primary"
-                size="lg"
-                onPress={handleLogin}
-                loading={loading}
-                fullWidth
-              />
-            </View>
-          </AnimatedEntry>
-
-          <AnimatedEntry delay={240}>
-            <View style={styles.footerRow}>
-              <Text style={styles.footerText}>¿No tenés una cuenta aún?</Text>
-              <Pressable onPress={() => router.push('/(auth)/register')} hitSlop={8}>
-                <Text style={styles.registerLink}>Registrate acá</Text>
-              </Pressable>
-            </View>
-          </AnimatedEntry>
-        </View>
+          </View>
+        </AnimatedEntry>
       </ScrollView>
-
-      <LoadingOverlay visible={loading} title="Iniciando sesión..." hint="Cargando tu perfil" />
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: palette.background },
+  safe: { flex: 1 },
   content: {
     flexGrow: 1,
     justifyContent: 'center',
@@ -158,85 +131,46 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 16,
-    backgroundColor: palette.primary,
     alignItems: 'center',
     justifyContent: 'center',
     ...shadow.sm,
-  },
-  brandLogoText: {
-    color: palette.textInverse,
-    fontSize: 24,
-    fontFamily: 'Fraunces_700Bold',
   },
   brandTextWrapper: {
     alignItems: 'center',
     marginTop: 4,
   },
   brandTitle: {
-    ...typography.bodyMedium,
-    color: palette.textPrimary,
+    ...typography.displaySoft,
+    fontSize: 26,
     fontFamily: 'Fraunces_700Bold',
-    fontSize: 20,
-    letterSpacing: 1.5,
-  },
-  brandTagline: {
-    ...typography.caption,
-    color: palette.textSecondary,
-    fontSize: 10,
     letterSpacing: 2,
-    marginTop: 2,
   },
-  heroBlock: {
-    alignItems: 'center',
-  },
-  heroTitle: {
-    ...typography.title,
-    color: palette.textPrimary,
-    fontFamily: 'Fraunces_500Medium',
-    fontSize: 28,
-    textAlign: 'center',
-  },
-  heroSubtitle: {
-    ...typography.bodySecondary,
-    color: palette.textSecondary,
-    marginTop: spacing.xs,
-    lineHeight: 22,
-    textAlign: 'center',
-  },
-  form: { gap: spacing.md },
-  errorBanner: {
-    padding: spacing.md,
-    borderRadius: radius.md,
-    backgroundColor: '#FEF2F2',
-    borderWidth: 1,
-    borderColor: '#FCA5A5',
-  },
-  errorText: {
-    ...typography.bodyMedium,
-    color: palette.error,
-    textAlign: 'center',
-    fontWeight: '500',
-  },
-  forgotBtn: { alignSelf: 'flex-end', marginTop: -4 },
-  forgotText: {
+  brandSubtitle: {
     ...typography.caption,
-    color: palette.primary,
-    fontWeight: '600',
+    marginTop: -2,
+  },
+  form: {
+    gap: spacing.md,
+  },
+  cardHeading: {
+    ...typography.titleSecondary,
+    fontFamily: 'Fraunces_500Medium',
+  },
+  cardSubheading: {
+    ...typography.caption,
+    marginTop: -8,
+    marginBottom: spacing.xs,
   },
   footerRow: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'center',
-    gap: spacing.xs,
     marginTop: spacing.xs,
   },
   footerText: {
     ...typography.bodySecondary,
-    color: palette.textSecondary,
   },
-  registerLink: {
-    ...typography.bodyMedium,
-    color: palette.primary,
+  linkText: {
+    ...typography.bodySecondary,
     fontWeight: '700',
   },
 });

@@ -1,5 +1,5 @@
 import { Text, View, StyleSheet } from 'react-native';
-import { palette, radius, spacing, typography } from '@/theme';
+import { radius, spacing, typography, useThemeColors } from '@/theme';
 import { Card } from './Card';
 
 export interface ProfileCardProps {
@@ -21,11 +21,13 @@ export function ProfileCard({
   age = 0,
   goal = 'Mantener',
 }: ProfileCardProps) {
+  const colors = useThemeColors();
+
   return (
     <Card variant="elevated" padding="lg">
       <View style={styles.row}>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>
+        <View style={[styles.avatar, { backgroundColor: colors.primary }]}>
+          <Text style={[styles.avatarText, { color: colors.textInverse }]}>
             {name
               .split(' ')
               .map((p) => p[0])
@@ -36,33 +38,33 @@ export function ProfileCard({
           </Text>
         </View>
         <View style={styles.info}>
-          <Text style={styles.name}>{name}</Text>
-          <Text style={styles.level}>{level}</Text>
+          <Text style={[styles.name, { color: colors.textPrimary }]}>{name}</Text>
+          <Text style={[styles.level, { color: colors.textSecondary }]}>{level}</Text>
         </View>
         {streak > 0 ? (
-          <View style={styles.streakBadge}>
-            <Text style={styles.streakValue}>{streak}</Text>
-            <Text style={styles.streakLabel}>días</Text>
+          <View style={[styles.streakBadge, { backgroundColor: colors.primarySoft }]}>
+            <Text style={[styles.streakValue, { color: colors.primary }]}>{streak}</Text>
+            <Text style={[styles.streakLabel, { color: colors.primary }]}>días</Text>
           </View>
         ) : null}
       </View>
-      <View style={styles.statsRow}>
-        <Stat label="Peso" value={`${weight} kg`} />
-        <Stat label="Altura" value={`${height} cm`} />
-        <Stat label="Edad" value={`${age} años`} />
-        <Stat label="Objetivo" value={goal} />
+      <View style={[styles.statsRow, { borderTopColor: colors.divider }]}>
+        <Stat label="Peso" value={`${weight} kg`} colors={colors} />
+        <Stat label="Altura" value={`${height} cm`} colors={colors} />
+        <Stat label="Edad" value={`${age} años`} colors={colors} />
+        <Stat label="Objetivo" value={goal} colors={colors} />
       </View>
     </Card>
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function Stat({ label, value, colors }: { label: string; value: string; colors: ReturnType<typeof useThemeColors> }) {
   return (
     <View style={styles.stat}>
-      <Text style={styles.statValue} numberOfLines={1} adjustsFontSizeToFit>
+      <Text style={[styles.statValue, { color: colors.textPrimary }]} numberOfLines={1} adjustsFontSizeToFit>
         {value}
       </Text>
-      <Text style={styles.statLabel}>{label}</Text>
+      <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{label}</Text>
     </View>
   );
 }
@@ -78,27 +80,24 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: palette.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
   avatarText: {
     ...typography.titleSecondary,
-    color: palette.textInverse,
     fontWeight: '700',
   },
   info: { flex: 1 },
-  name: { ...typography.titleSecondary, color: palette.textPrimary, fontWeight: '700' },
-  level: { ...typography.caption, color: palette.textSecondary, marginTop: 2 },
+  name: { ...typography.titleSecondary, fontWeight: '700' },
+  level: { ...typography.caption, marginTop: 2 },
   streakBadge: {
     paddingHorizontal: 12,
     paddingVertical: 6,
-    backgroundColor: '#FFEDED',
     borderRadius: radius.pill,
     alignItems: 'center',
   },
-  streakValue: { ...typography.bodyMedium, color: palette.primary, fontWeight: '700' },
-  streakLabel: { ...typography.label, color: palette.primary, marginTop: -2 },
+  streakValue: { ...typography.bodyMedium, fontWeight: '700' },
+  streakLabel: { ...typography.label, marginTop: -2 },
   statsRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -106,7 +105,6 @@ const styles = StyleSheet.create({
     columnGap: spacing.lg,
     paddingTop: spacing.lg,
     borderTopWidth: 1,
-    borderTopColor: palette.divider,
   },
   stat: {
     flexGrow: 1,
@@ -118,13 +116,11 @@ const styles = StyleSheet.create({
   },
   statValue: {
     ...typography.bodyMedium,
-    color: palette.textPrimary,
     fontWeight: '600',
     fontVariant: ['tabular-nums'],
   },
   statLabel: {
     ...typography.label,
-    color: palette.textSecondary,
     marginTop: 6,
     textTransform: 'uppercase',
     letterSpacing: 0.4,

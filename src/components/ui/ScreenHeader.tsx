@@ -1,6 +1,6 @@
 import { Text, View, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
 import type { ReactNode } from 'react';
-import { palette, spacing, typography } from '@/theme';
+import { spacing, typography, useThemeColors } from '@/theme';
 
 export interface ScreenHeaderProps {
   title: string;
@@ -23,15 +23,17 @@ export function ScreenHeader({
   align = 'left',
   style,
 }: ScreenHeaderProps) {
+  const colors = useThemeColors();
   const titleStyle = serif ? styles.titleSerif : styles.title;
+
   return (
     <View style={[styles.wrapper, style]}>
-      {eyebrow ? <Text style={styles.eyebrow}>{eyebrow}</Text> : null}
+      {eyebrow ? <Text style={[styles.eyebrow, { color: colors.primary }]}>{eyebrow}</Text> : null}
       <View style={[styles.row, align === 'center' && styles.rowCenter]}>
         {leading ? <View style={styles.leading}>{leading}</View> : null}
         <View style={styles.titles}>
-          <Text style={[titleStyle, align === 'center' && styles.titleCenter]}>{title}</Text>
-          {subtitle ? <Text style={[styles.subtitle, align === 'center' && styles.subtitleCenter]}>{subtitle}</Text> : null}
+          <Text style={[titleStyle, { color: colors.textPrimary }, align === 'center' && styles.titleCenter]}>{title}</Text>
+          {subtitle ? <Text style={[styles.subtitle, { color: colors.textSecondary }, align === 'center' && styles.subtitleCenter]}>{subtitle}</Text> : null}
         </View>
         {trailing ? <View style={styles.trailing}>{trailing}</View> : null}
       </View>
@@ -52,22 +54,18 @@ const styles = StyleSheet.create({
   trailing: {},
   eyebrow: {
     ...typography.overline,
-    color: palette.primary,
     marginBottom: 6,
   },
   title: {
     ...typography.title,
-    color: palette.textPrimary,
   },
   titleSerif: {
     ...typography.display,
-    color: palette.textPrimary,
     fontSize: 34,
   },
   titleCenter: { textAlign: 'center' },
   subtitle: {
     ...typography.bodySecondary,
-    color: palette.textSecondary,
     marginTop: 6,
   },
   subtitleCenter: { textAlign: 'center' },

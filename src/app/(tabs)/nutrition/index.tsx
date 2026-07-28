@@ -15,14 +15,17 @@ import {
 import { ChevronRight } from '@/components/ui/icons';
 import { palette, radius, spacing, typography } from '@/theme';
 
+import { useThemeColors } from '@/theme';
+
 export default function NutritionScreen() {
+  const colors = useThemeColors();
   const hasScannedPlan = useUserStore((state) => state.hasScannedPlan);
   const activeRecipeId = useSessionStore((state) => state.activeRecipeId);
   const startWeighing = useSessionStore((state) => state.startWeighing);
 
   if (!hasScannedPlan) {
     return (
-      <SafeAreaView style={styles.safe} edges={['top']}>
+      <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top']}>
         <View style={styles.container}>
           <AnimatedEntry>
             <ScreenHeader
@@ -50,7 +53,7 @@ export default function NutritionScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top']}>
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
@@ -117,7 +120,7 @@ export default function NutritionScreen() {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: palette.background },
   container: { flex: 1, paddingHorizontal: spacing.lg, paddingTop: spacing.md },
-  content: { paddingHorizontal: spacing.lg, paddingBottom: spacing['2xl'] },
+  content: { paddingHorizontal: spacing.lg, paddingBottom: 110 },
   filterRow: {
     flexDirection: 'row',
     gap: spacing.sm,

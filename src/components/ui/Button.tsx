@@ -1,7 +1,7 @@
-import { forwardRef, useMemo } from 'react';
+import { forwardRef } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import type { PressableProps, StyleProp, TextStyle, ViewStyle } from 'react-native';
-import { palette, radius, shadow, typography } from '@/theme';
+import { radius, shadow, typography, useThemeColors } from '@/theme';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'outlined' | 'destructive' | 'ghost';
 export type ButtonSize = 'sm' | 'md' | 'lg';
@@ -32,33 +32,6 @@ const sizeStyles: Record<ButtonSize, { container: ViewStyle; text: TextStyle }> 
   },
 };
 
-const variantStyles: Record<ButtonVariant, { container: ViewStyle; text: TextStyle }> = {
-  primary: {
-    container: { backgroundColor: palette.primary },
-    text: { color: palette.textInverse },
-  },
-  secondary: {
-    container: { backgroundColor: palette.primarySoft },
-    text: { color: palette.primary },
-  },
-  outlined: {
-    container: {
-      backgroundColor: 'transparent',
-      borderWidth: 1.5,
-      borderColor: palette.textPrimary,
-    },
-    text: { color: palette.textPrimary },
-  },
-  destructive: {
-    container: { backgroundColor: palette.primaryDark },
-    text: { color: palette.textInverse },
-  },
-  ghost: {
-    container: { backgroundColor: 'transparent' },
-    text: { color: palette.textPrimary },
-  },
-};
-
 export const Button = forwardRef<View, ButtonProps>(function Button(
   {
     label,
@@ -69,20 +42,43 @@ export const Button = forwardRef<View, ButtonProps>(function Button(
     leftIcon,
     rightIcon,
     fullWidth = true,
-    className,
     style,
     ...rest
   },
   ref,
 ) {
+  const colors = useThemeColors();
   const isDisabled = disabled || loading;
   const sizeStyle = sizeStyles[size];
-  const variantStyle = variantStyles[variant];
 
-  const pressStyle = useMemo<ViewStyle>(
-    () => ({ transform: [{ scale: 0.97 }] }),
-    [],
-  );
+  const variantStyles: Record<ButtonVariant, { container: ViewStyle; text: TextStyle }> = {
+    primary: {
+      container: { backgroundColor: colors.primary },
+      text: { color: colors.textInverse },
+    },
+    secondary: {
+      container: { backgroundColor: colors.primarySoft },
+      text: { color: colors.primary },
+    },
+    outlined: {
+      container: {
+        backgroundColor: 'transparent',
+        borderWidth: 1.5,
+        borderColor: colors.textPrimary,
+      },
+      text: { color: colors.textPrimary },
+    },
+    destructive: {
+      container: { backgroundColor: colors.error },
+      text: { color: colors.textInverse },
+    },
+    ghost: {
+      container: { backgroundColor: 'transparent' },
+      text: { color: colors.textPrimary },
+    },
+  };
+
+  const variantStyle = variantStyles[variant];
 
   return (
     <Pressable
@@ -97,7 +93,7 @@ export const Button = forwardRef<View, ButtonProps>(function Button(
         fullWidth && styles.fullWidth,
         isDisabled && styles.disabled,
         variant === 'primary' && !isDisabled && shadow.sm,
-        pressed && pressStyle,
+        pressed && styles.pressed,
         style,
       ]}
       {...rest}
@@ -105,7 +101,7 @@ export const Button = forwardRef<View, ButtonProps>(function Button(
       {loading ? (
         <ActivityIndicator
           size="small"
-          color={variant === 'primary' || variant === 'destructive' ? palette.textInverse : palette.primary}
+          color={variant === 'primary' || variant === 'destructive' ? colors.textInverse : colors.primary}
         />
       ) : (
         <>
@@ -127,5 +123,6 @@ const styles = StyleSheet.create({
   },
   fullWidth: { width: '100%' },
   disabled: { opacity: 0.5 },
+  pressed: { transform: [{ scale: 0.97 }] },
   text: { ...typography.button },
 });

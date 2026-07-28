@@ -43,12 +43,15 @@ const historyData: HistoryDay[] = [
   },
 ];
 
+import { useThemeColors } from '@/theme';
+
 export default function HistoryScreen() {
+  const colors = useThemeColors();
   const streak = useUserStore((state) => state.streak);
 
   if (historyData.length === 0) {
     return (
-      <SafeAreaView style={styles.safe} edges={['top']}>
+      <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top']}>
         <View style={styles.container}>
           <ScreenHeader eyebrow="Historial" title="Tu actividad" subtitle="Comidas registradas y progreso reciente" />
           <EmptyState
@@ -62,7 +65,7 @@ export default function HistoryScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top']}>
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
@@ -143,7 +146,7 @@ export default function HistoryScreen() {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: palette.background },
   container: { flex: 1, paddingHorizontal: spacing.lg, paddingTop: spacing.md },
-  content: { paddingHorizontal: spacing.lg, paddingBottom: spacing['2xl'] },
+  content: { paddingHorizontal: spacing.lg, paddingBottom: 110 },
   metricsRow: { flexDirection: 'row', gap: spacing.md, marginBottom: spacing.lg },
   metricWrapper: { flex: 1 },
   section: { marginBottom: spacing.lg },
