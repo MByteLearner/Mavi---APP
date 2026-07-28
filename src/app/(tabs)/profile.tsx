@@ -2,7 +2,7 @@ import { View, Text, ScrollView, Pressable, StyleSheet, Switch, Alert } from 're
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
 
-import { ProfileCard, Button, Chip } from '@/components/ui';
+import { ProfileCard, Button, Chip, AnimatedEntry } from '@/components/ui';
 import { ChevronRight, Settings, Notification, Edit, Heart, Target } from '@/components/ui/icons';
 import { palette, radius, spacing, typography } from '@/theme';
 
@@ -15,75 +15,72 @@ export default function ProfileScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.header}>
-          <Text style={styles.title}>Perfil</Text>
-          <Pressable style={styles.settingsBtn} accessibilityLabel="Configuración">
-            <Settings size={20} color={palette.textPrimary} />
-          </Pressable>
-        </View>
-
-        <ProfileCard
-          name="María García"
-          level="Nivel Avanzado"
-          streak={7}
-          weight="68.4"
-          height="168"
-          age={28}
-          goal="Perder grasa"
-        />
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Mis objetivos</Text>
-          <View style={styles.goalsRow}>
-            <Chip label="Perder 3 kg" tone="brand" icon={<Target size={14} color={palette.primary} />} />
-            <Chip label="5 comidas/día" tone="success" />
-            <Chip label="8 vasos de agua" tone="info" />
+        <AnimatedEntry>
+          <View style={styles.header}>
+            <Text style={styles.title}>Perfil</Text>
+            <Pressable style={styles.settingsBtn} accessibilityLabel="Configuración">
+              <Settings size={20} color={palette.textPrimary} />
+            </Pressable>
           </View>
-        </View>
+        </AnimatedEntry>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Configuración</Text>
-          <View style={styles.menuGroup}>
-            <MenuRow
-              icon={<Edit size={20} color={palette.primary} />}
-              label="Editar perfil"
-              onPress={() => Alert.alert('Próximamente')}
-            />
-            <MenuRow
-              icon={<Target size={20} color={palette.primary} />}
-              label="Mis objetivos"
-              onPress={() => Alert.alert('Próximamente')}
-            />
-            <MenuRow
-              icon={<Notification size={20} color={palette.primary} />}
-              label="Notificaciones"
-              right={
-                <Switch
-                  value={notifications}
-                  onValueChange={setNotifications}
-                  trackColor={{ false: palette.divider, true: palette.primary }}
-                  thumbColor={palette.surface}
-                />
-              }
-            />
-            <MenuRow
-              icon={<Heart size={20} color={palette.primary} />}
-              label="Favoritos"
-              onPress={() => Alert.alert('Próximamente')}
-              isLast
-            />
-          </View>
-        </View>
+        <AnimatedEntry delay={80}>
+          <ProfileCard
+            name="María García"
+            level="Nivel Avanzado"
+            streak={7}
+            weight="68.4"
+            height="168"
+            age={28}
+            goal="Perder grasa"
+          />
+        </AnimatedEntry>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Más</Text>
-          <View style={styles.menuGroup}>
-            <MenuRow label="Términos y condiciones" onPress={() => Alert.alert('Próximamente')} />
-            <MenuRow label="Política de privacidad" onPress={() => Alert.alert('Próximamente')} />
-            <MenuRow label="Ayuda y soporte" onPress={() => Alert.alert('Próximamente')} />
-            <MenuRow label="Acerca de MAVI" onPress={() => Alert.alert('Próximamente')} isLast />
+        <AnimatedEntry delay={160}>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Mis objetivos</Text>
+            <View style={styles.goalsRow}>
+              <Chip label="Perder 3 kg" tone="brand" icon={<Target size={14} color={palette.primary} />} />
+              <Chip label="5 comidas/día" tone="success" />
+              <Chip label="8 vasos de agua" tone="info" />
+            </View>
           </View>
-        </View>
+        </AnimatedEntry>
+
+        <AnimatedEntry delay={240}>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Configuración</Text>
+            <View style={styles.menuGroup}>
+              <MenuRow icon={<Edit size={20} color={palette.primary} />} label="Editar perfil" onPress={() => Alert.alert('Próximamente')} />
+              <MenuRow icon={<Target size={20} color={palette.primary} />} label="Mis objetivos" onPress={() => Alert.alert('Próximamente')} />
+              <MenuRow
+                icon={<Notification size={20} color={palette.primary} />}
+                label="Notificaciones"
+                right={
+                  <Switch
+                    value={notifications}
+                    onValueChange={setNotifications}
+                    trackColor={{ false: palette.divider, true: palette.primary }}
+                    thumbColor={palette.surface}
+                  />
+                }
+              />
+              <MenuRow icon={<Heart size={20} color={palette.primary} />} label="Favoritos" onPress={() => Alert.alert('Próximamente')} isLast />
+            </View>
+          </View>
+        </AnimatedEntry>
+
+        <AnimatedEntry delay={320}>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Más</Text>
+            <View style={styles.menuGroup}>
+              <MenuRow label="Términos y condiciones" onPress={() => Alert.alert('Próximamente')} />
+              <MenuRow label="Política de privacidad" onPress={() => Alert.alert('Próximamente')} />
+              <MenuRow label="Ayuda y soporte" onPress={() => Alert.alert('Próximamente')} />
+              <MenuRow label="Acerca de MAVI" onPress={() => Alert.alert('Próximamente')} isLast />
+            </View>
+          </View>
+        </AnimatedEntry>
 
         <View style={styles.footer}>
           <Button
@@ -138,20 +135,22 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
     marginBottom: spacing.lg,
   },
-  title: { ...typography.title, color: palette.textPrimary, fontWeight: '700' },
+  title: { ...typography.title, color: palette.textPrimary, fontFamily: 'Fraunces_500Medium' },
   settingsBtn: {
     width: 44,
     height: 44,
     borderRadius: 22,
     backgroundColor: palette.surface,
+    borderWidth: 1,
+    borderColor: palette.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
   section: { marginTop: spacing.lg },
   sectionTitle: {
-    ...typography.subheading,
+    ...typography.titleSecondary,
     color: palette.textPrimary,
-    fontWeight: '700',
+    fontFamily: 'Fraunces_500Medium',
     marginBottom: spacing.md,
   },
   goalsRow: { flexDirection: 'row', gap: spacing.sm, flexWrap: 'wrap' },
@@ -159,6 +158,8 @@ const styles = StyleSheet.create({
     backgroundColor: palette.surface,
     borderRadius: radius.card,
     overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: palette.border,
   },
   row: {
     flexDirection: 'row',
@@ -173,7 +174,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 10,
-    backgroundColor: '#FFEDED',
+    backgroundColor: palette.primarySoft,
     alignItems: 'center',
     justifyContent: 'center',
   },

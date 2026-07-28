@@ -13,14 +13,14 @@ export function AIRecommendationCard({ title, body, tag = 'IA', onPress }: AIRec
   return (
     <Pressable
       onPress={onPress}
-      style={({ pressed }) => [styles.card, pressed && { transform: [{ scale: 0.98 }] }]}
+      style={({ pressed }) => [styles.card, pressed && styles.pressed]}
       accessibilityRole="button"
     >
       <View style={styles.header}>
         <View style={styles.iconBox}>
-          <Text style={styles.iconText}>✨</Text>
+          <Text style={styles.iconText}>✦</Text>
         </View>
-        <View style={styles.flex}>
+        <View style={{ flex: 1 }}>
           <Chip label={tag} tone="brand" />
         </View>
       </View>
@@ -37,19 +37,19 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     gap: spacing.sm,
     borderWidth: 1,
-    borderColor: '#FFEDED',
+    borderColor: palette.primarySoft,
   },
+  pressed: { transform: [{ scale: 0.98 }] },
   header: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   iconBox: {
     width: 36,
     height: 36,
     borderRadius: 12,
-    backgroundColor: '#FFEDED',
+    backgroundColor: palette.primarySoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  iconText: { fontSize: 18 },
-  flex: { flex: 1 },
+  iconText: { fontSize: 18, color: palette.primary, fontWeight: '700' },
   title: { ...typography.subheading, color: palette.textPrimary, marginTop: 4 },
   body: { ...typography.bodySecondary, color: palette.textSecondary },
 });

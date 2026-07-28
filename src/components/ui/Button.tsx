@@ -20,15 +20,15 @@ export interface ButtonProps extends Omit<PressableProps, 'children' | 'style'> 
 const sizeStyles: Record<ButtonSize, { container: ViewStyle; text: TextStyle }> = {
   sm: {
     container: { height: 40, paddingHorizontal: 16, borderRadius: 14 },
-    text: { fontSize: 14, fontWeight: '600' },
+    text: { fontSize: 13 },
   },
   md: {
     container: { height: 48, paddingHorizontal: 20, borderRadius: 16 },
-    text: { fontSize: 15, fontWeight: '600' },
+    text: { fontSize: 14 },
   },
   lg: {
     container: { height: 56, paddingHorizontal: 24, borderRadius: radius.button },
-    text: { ...typography.button },
+    text: { fontSize: 15 },
   },
 };
 
@@ -38,16 +38,16 @@ const variantStyles: Record<ButtonVariant, { container: ViewStyle; text: TextSty
     text: { color: palette.textInverse },
   },
   secondary: {
-    container: { backgroundColor: '#FFEDED' },
+    container: { backgroundColor: palette.primarySoft },
     text: { color: palette.primary },
   },
   outlined: {
     container: {
       backgroundColor: 'transparent',
       borderWidth: 1.5,
-      borderColor: palette.primary,
+      borderColor: palette.textPrimary,
     },
-    text: { color: palette.primary },
+    text: { color: palette.textPrimary },
   },
   destructive: {
     container: { backgroundColor: palette.primaryDark },
@@ -55,7 +55,7 @@ const variantStyles: Record<ButtonVariant, { container: ViewStyle; text: TextSty
   },
   ghost: {
     container: { backgroundColor: 'transparent' },
-    text: { color: palette.primary },
+    text: { color: palette.textPrimary },
   },
 };
 
@@ -110,7 +110,7 @@ export const Button = forwardRef<View, ButtonProps>(function Button(
       ) : (
         <>
           {leftIcon}
-          <Text style={[sizeStyle.text, variantStyle.text]}>{label}</Text>
+          <Text style={[styles.text, sizeStyle.text, variantStyle.text]}>{label}</Text>
           {rightIcon}
         </>
       )}
@@ -127,4 +127,5 @@ const styles = StyleSheet.create({
   },
   fullWidth: { width: '100%' },
   disabled: { opacity: 0.5 },
+  text: { ...typography.button },
 });

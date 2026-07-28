@@ -50,8 +50,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
   },
   initials: {
-    ...typography.bodyMedium,
+    ...typography.button,
     color: palette.textInverse,
-    fontWeight: '700',
   },
 });
