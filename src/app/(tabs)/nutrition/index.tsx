@@ -13,18 +13,18 @@ import {
   AnimatedEntry,
 } from '@/components/ui';
 import { ChevronRight } from '@/components/ui/icons';
-import { palette, radius, spacing, typography , useThemeColors } from '@/theme';
-
+import { useThemeColors, type PaletteColors, radius, spacing, typography } from '@/theme';
 
 export default function NutritionScreen() {
   const colors = useThemeColors();
+  const styles = createStyles(colors);
   const hasScannedPlan = useUserStore((state) => state.hasScannedPlan);
   const activeRecipeId = useSessionStore((state) => state.activeRecipeId);
   const startWeighing = useSessionStore((state) => state.startWeighing);
 
   if (!hasScannedPlan) {
     return (
-      <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top']}>
+      <SafeAreaView style={styles.safe} edges={['top']}>
         <View style={styles.container}>
           <AnimatedEntry>
             <ScreenHeader
@@ -52,7 +52,7 @@ export default function NutritionScreen() {
   }
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top']}>
+    <SafeAreaView style={styles.safe} edges={['top']}>
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
@@ -105,7 +105,7 @@ export default function NutritionScreen() {
                       <Text style={styles.itemMetaText}>{recipe.calories} kcal</Text>
                     </View>
                   </View>
-                  <ChevronRight size={20} color={palette.textDisabled} />
+                  <ChevronRight size={20} color={colors.textDisabled} />
                 </Pressable>
               </AnimatedEntry>
             );
@@ -116,41 +116,44 @@ export default function NutritionScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: palette.background },
-  container: { flex: 1, paddingHorizontal: spacing.lg, paddingTop: spacing.md },
-  content: { paddingHorizontal: spacing.lg, paddingBottom: 110 },
-  filterRow: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-    marginBottom: spacing.lg,
-    flexWrap: 'wrap',
-  },
-  list: { gap: spacing.md },
-  item: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: palette.surface,
-    borderRadius: radius.card,
-    padding: spacing.md,
-    gap: spacing.md,
-    borderWidth: 1,
-    borderColor: palette.border,
-  },
-  itemSelected: { borderColor: palette.primary, borderWidth: 2 },
-  itemPressed: { transform: [{ scale: 0.98 }] },
-  itemEmoji: {
-    width: 56,
-    height: 56,
-    borderRadius: 16,
-    backgroundColor: palette.primarySoft,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  itemEmojiText: { fontSize: 28 },
-  itemName: { ...typography.bodyMedium, color: palette.textPrimary, fontWeight: '700' },
-  itemDescription: { ...typography.caption, color: palette.textSecondary, marginTop: 2 },
-  itemMeta: { flexDirection: 'row', alignItems: 'center', marginTop: 6, gap: 6 },
-  itemMetaText: { ...typography.caption, color: palette.textSecondary },
-  itemMetaDot: { ...typography.caption, color: palette.textDisabled },
-});
+function createStyles(colors: PaletteColors) {
+  return StyleSheet.create({
+    safe: { flex: 1, backgroundColor: colors.background },
+    container: { flex: 1, paddingHorizontal: spacing.lg, paddingTop: spacing.md },
+    content: { paddingHorizontal: spacing.lg, paddingBottom: 110 },
+    filterRow: {
+      flexDirection: 'row',
+      gap: spacing.sm,
+      marginBottom: spacing.lg,
+      flexWrap: 'wrap',
+    },
+    list: { gap: spacing.md },
+    item: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.surface,
+      borderRadius: radius.card,
+      padding: spacing.md,
+      gap: spacing.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    itemSelected: { borderColor: colors.primary, borderWidth: 2 },
+    itemPressed: { transform: [{ scale: 0.98 }] },
+    itemEmoji: {
+      width: 56,
+      height: 56,
+      borderRadius: 16,
+      backgroundColor: colors.primarySoft,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    itemEmojiText: { fontSize: 28 },
+    itemName: { ...typography.bodyMedium, color: colors.textPrimary, fontWeight: '700' },
+    itemDescription: { ...typography.caption, color: colors.textSecondary, marginTop: 2 },
+    itemMeta: { flexDirection: 'row', alignItems: 'center', marginTop: 6, gap: 6 },
+    itemMetaText: { ...typography.caption, color: colors.textSecondary },
+    itemMetaDot: { ...typography.caption, color: colors.textDisabled },
+  });
+}
+

@@ -12,8 +12,7 @@ import {
   AnimatedEntry,
 } from '@/components/ui';
 import { Flame, Scale } from '@/components/ui/icons';
-import { palette, spacing, typography , useThemeColors } from '@/theme';
-
+import { useThemeColors, type PaletteColors, spacing, typography } from '@/theme';
 
 interface HistoryDay {
   date: string;
@@ -46,11 +45,12 @@ const historyData: HistoryDay[] = [
 
 export default function HistoryScreen() {
   const colors = useThemeColors();
+  const styles = createStyles(colors);
   const streak = useUserStore((state) => state.streak);
 
   if (historyData.length === 0) {
     return (
-      <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top']}>
+      <SafeAreaView style={styles.safe} edges={['top']}>
         <View style={styles.container}>
           <ScreenHeader eyebrow="Historial" title="Tu actividad" subtitle="Comidas registradas y progreso reciente" />
           <EmptyState
@@ -64,7 +64,7 @@ export default function HistoryScreen() {
   }
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top']}>
+    <SafeAreaView style={styles.safe} edges={['top']}>
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
@@ -85,7 +85,7 @@ export default function HistoryScreen() {
                 value={streak.toString()}
                 unit="días"
                 caption="Mejor racha: 14"
-                icon={<Flame size={18} color={palette.primary} />}
+                icon={<Flame size={18} color={colors.primary} />}
                 tone="brand"
               />
             </View>
@@ -97,7 +97,7 @@ export default function HistoryScreen() {
                 caption="-0.6 kg esta semana"
                 trend="down"
                 trendLabel="-0.6 vs semana"
-                icon={<Scale size={18} color={palette.success} />}
+                icon={<Scale size={18} color={colors.success} />}
                 tone="success"
               />
             </View>
@@ -142,24 +142,27 @@ export default function HistoryScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: palette.background },
-  container: { flex: 1, paddingHorizontal: spacing.lg, paddingTop: spacing.md },
-  content: { paddingHorizontal: spacing.lg, paddingBottom: 110 },
-  metricsRow: { flexDirection: 'row', gap: spacing.md, marginBottom: spacing.lg },
-  metricWrapper: { flex: 1 },
-  section: { marginBottom: spacing.lg },
-  sectionTitle: {
-    ...typography.titleSecondary,
-    color: palette.textPrimary,
-    fontFamily: 'Fraunces_500Medium',
-  },
-  day: { marginBottom: spacing.lg },
-  dayHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: spacing.md,
-  },
-  dayLabel: { ...typography.subheading, color: palette.textPrimary, fontWeight: '700' },
-});
+function createStyles(colors: PaletteColors) {
+  return StyleSheet.create({
+    safe: { flex: 1, backgroundColor: colors.background },
+    container: { flex: 1, paddingHorizontal: spacing.lg, paddingTop: spacing.md },
+    content: { paddingHorizontal: spacing.lg, paddingBottom: 110 },
+    metricsRow: { flexDirection: 'row', gap: spacing.md, marginBottom: spacing.lg },
+    metricWrapper: { flex: 1 },
+    section: { marginBottom: spacing.lg },
+    sectionTitle: {
+      ...typography.titleSecondary,
+      color: colors.textPrimary,
+      fontFamily: 'Fraunces_500Medium',
+    },
+    day: { marginBottom: spacing.lg },
+    dayHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: spacing.md,
+    },
+    dayLabel: { ...typography.subheading, color: colors.textPrimary, fontWeight: '700' },
+  });
+}
+

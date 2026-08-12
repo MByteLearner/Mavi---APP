@@ -18,7 +18,12 @@ interface UserState {
   setPlanScanned: (planId: string) => void;
   setProfile: (profile: UserProfile) => void;
   setStreak: (streak: number) => void;
-  updateProfile: (updates: { name?: string; goals?: string[]; allergies?: string[] }) => Promise<void>;
+  updateProfile: (updates: {
+    name?: string;
+    goal?: 'lose' | 'maintain' | 'gain';
+    goals?: string[];
+    allergies?: string[];
+  }) => Promise<void>;
   registerCompletion: () => void;
   resetStreak: () => void;
   _hasHydrated: boolean;
@@ -49,8 +54,15 @@ export const useUserStore = create<UserState>()(
         const current = get().profile;
         const updated = { ...current, ...updates } as UserProfile;
 
+        // Import useAuthStore dynamically to avoid circular import dependency
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { useAuthStore } = require('./useAuthStore');
+
         if (API_CONFIG.useMocks) {
           set({ profile: updated });
+          useAuthStore.setState((s: any) => ({
+            user: s.user ? { ...s.user, ...updates } : null,
+          }));
           return;
         }
 
@@ -59,13 +71,16 @@ export const useUserStore = create<UserState>()(
             method: 'PUT',
             body: updates,
           });
-          if (res?.user) {
-            set({ profile: res.user, streak: res.user.streak ?? get().streak });
-          } else {
-            set({ profile: updated });
-          }
+          const finalProfile = res?.user ?? updated;
+          set({ profile: finalProfile, streak: finalProfile.streak ?? get().streak });
+          useAuthStore.setState((s: any) => ({
+            user: s.user ? { ...s.user, ...updates } : null,
+          }));
         } catch {
           set({ profile: updated });
+          useAuthStore.setState((s: any) => ({
+            user: s.user ? { ...s.user, ...updates } : null,
+          }));
         }
       },
       registerCompletion: () => {

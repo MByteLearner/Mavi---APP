@@ -64,4 +64,7 @@ export const ArrowRight = makeIcon('arrow-forward');
 export const Moon = makeIcon('moon-outline');
 export const Sun = makeIcon('sunny-outline');
 export const Contrast = makeIcon('contrast-outline');
+export const ShieldCheck = makeIcon('shield-checkmark-outline');
+export const Trash = makeIcon('trash-outline');
+export const AlertCircle = makeIcon('alert-circle-outline');
 

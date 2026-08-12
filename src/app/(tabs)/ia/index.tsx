@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import { AIRecommendationCard, Chip, AnimatedEntry } from '@/components/ui';
 import { Mic, Send, Image } from '@/components/ui/icons';
-import { palette, radius, spacing, typography } from '@/theme';
+import { useThemeColors, type PaletteColors, radius, spacing, typography } from '@/theme';
 
 interface ChatMessage {
   id: string;
@@ -27,6 +27,8 @@ const suggestions = [
 ];
 
 export default function IAScreen() {
+  const colors = useThemeColors();
+  const styles = createStyles(colors);
   const [messages] = useState<ChatMessage[]>(seed);
   const [input, setInput] = useState('');
 
@@ -101,24 +103,24 @@ export default function IAScreen() {
         </View>
         <View style={styles.inputRow}>
           <Pressable style={styles.iconBtn} accessibilityLabel="Adjuntar imagen">
-            <Image size={20} color={palette.textSecondary} />
+            <Image size={20} color={colors.textSecondary} />
           </Pressable>
           <TextInput
             value={input}
             onChangeText={setInput}
             placeholder="Escribí tu pregunta..."
-            placeholderTextColor={palette.textDisabled}
+            placeholderTextColor={colors.textDisabled}
             style={styles.input}
           />
           <Pressable style={styles.iconBtn} accessibilityLabel="Dictar">
-            <Mic size={20} color={palette.textSecondary} />
+            <Mic size={20} color={colors.textSecondary} />
           </Pressable>
           <Pressable
             style={[styles.sendBtn, !input && styles.sendBtnDisabled]}
             accessibilityLabel="Enviar"
             disabled={!input}
           >
-            <Send size={18} color={palette.textInverse} />
+            <Send size={18} color={colors.textInverse} />
           </Pressable>
         </View>
       </View>
@@ -126,107 +128,110 @@ export default function IAScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: palette.background },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    backgroundColor: palette.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: palette.divider,
-  },
-  headerLeft: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: palette.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  avatarText: { color: palette.textInverse, fontSize: 18, fontWeight: '700', fontFamily: 'Fraunces_700Bold' },
-  headerTitle: { ...typography.bodyMedium, color: palette.textPrimary, fontWeight: '700', fontFamily: 'Fraunces_500Medium', fontSize: 16 },
-  statusRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 },
-  statusDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: palette.success },
-  statusText: { ...typography.caption, color: palette.textSecondary },
-  feed: { flex: 1 },
-  feedContent: { padding: spacing.lg, paddingBottom: spacing['2xl'] },
-  bubble: {
-    padding: spacing.md,
-    borderRadius: radius.lg,
-    marginBottom: spacing.sm,
-    maxWidth: '88%',
-    borderWidth: 1,
-  },
-  bubbleUser: {
-    alignSelf: 'flex-end',
-    backgroundColor: palette.primary,
-    borderColor: palette.primary,
-  },
-  bubbleAssistant: {
-    alignSelf: 'flex-start',
-    backgroundColor: palette.surface,
-    borderColor: palette.border,
-  },
-  bubbleText: { ...typography.body, lineHeight: 24 },
-  bubbleTextUser: { color: palette.textInverse },
-  bubbleTextAssistant: { color: palette.textPrimary },
-  bubbleTextSerif: { fontFamily: 'Fraunces_400Regular', fontSize: 16, lineHeight: 26 },
-  suggestionsBlock: { marginTop: spacing.lg, gap: spacing.md },
-  suggestionsTitle: {
-    ...typography.titleSecondary,
-    color: palette.textPrimary,
-    marginBottom: spacing.xs,
-  },
-  composer: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.lg,
-    backgroundColor: palette.surface,
-    borderTopWidth: 1,
-    borderTopColor: palette.divider,
-  },
-  suggestionsRow: { flexDirection: 'row', gap: spacing.sm, marginBottom: spacing.sm, flexWrap: 'wrap' },
-  suggestionPill: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: radius.pill,
-    backgroundColor: palette.primarySoft,
-  },
-  suggestionText: { ...typography.caption, color: palette.primary, fontWeight: '600' },
-  inputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: palette.background,
-    borderRadius: radius.pill,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderWidth: 1,
-    borderColor: palette.border,
-  },
-  iconBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  input: {
-    flex: 1,
-    ...typography.body,
-    color: palette.textPrimary,
-    paddingHorizontal: 8,
-  },
-  sendBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: palette.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  sendBtnDisabled: { backgroundColor: palette.textDisabled, opacity: 0.5 },
-});
+function createStyles(colors: PaletteColors) {
+  return StyleSheet.create({
+    safe: { flex: 1, backgroundColor: colors.background },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.md,
+      backgroundColor: colors.surface,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.divider,
+    },
+    headerLeft: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
+    avatar: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: colors.primary,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    avatarText: { color: colors.textInverse, fontSize: 18, fontWeight: '700', fontFamily: 'Fraunces_700Bold' },
+    headerTitle: { ...typography.bodyMedium, color: colors.textPrimary, fontWeight: '700', fontFamily: 'Fraunces_500Medium', fontSize: 16 },
+    statusRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 },
+    statusDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: colors.success },
+    statusText: { ...typography.caption, color: colors.textSecondary },
+    feed: { flex: 1 },
+    feedContent: { padding: spacing.lg, paddingBottom: spacing['2xl'] },
+    bubble: {
+      padding: spacing.md,
+      borderRadius: radius.lg,
+      marginBottom: spacing.sm,
+      maxWidth: '88%',
+      borderWidth: 1,
+    },
+    bubbleUser: {
+      alignSelf: 'flex-end',
+      backgroundColor: colors.primary,
+      borderColor: colors.primary,
+    },
+    bubbleAssistant: {
+      alignSelf: 'flex-start',
+      backgroundColor: colors.surface,
+      borderColor: colors.border,
+    },
+    bubbleText: { ...typography.body, lineHeight: 24 },
+    bubbleTextUser: { color: colors.textInverse },
+    bubbleTextAssistant: { color: colors.textPrimary },
+    bubbleTextSerif: { fontFamily: 'Fraunces_400Regular', fontSize: 16, lineHeight: 26 },
+    suggestionsBlock: { marginTop: spacing.lg, gap: spacing.md },
+    suggestionsTitle: {
+      ...typography.titleSecondary,
+      color: colors.textPrimary,
+      marginBottom: spacing.xs,
+    },
+    composer: {
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.md,
+      paddingBottom: spacing.lg,
+      backgroundColor: colors.surface,
+      borderTopWidth: 1,
+      borderTopColor: colors.divider,
+    },
+    suggestionsRow: { flexDirection: 'row', gap: spacing.sm, marginBottom: spacing.sm, flexWrap: 'wrap' },
+    suggestionPill: {
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: radius.pill,
+      backgroundColor: colors.primarySoft,
+    },
+    suggestionText: { ...typography.caption, color: colors.primary, fontWeight: '600' },
+    inputRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.background,
+      borderRadius: radius.pill,
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    iconBtn: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    input: {
+      flex: 1,
+      ...typography.body,
+      color: colors.textPrimary,
+      paddingHorizontal: 8,
+    },
+    sendBtn: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      backgroundColor: colors.primary,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    sendBtnDisabled: { backgroundColor: colors.textDisabled, opacity: 0.5 },
+  });
+}
+

@@ -1,3 +1,20 @@
+jest.mock('expo-router', () => ({
+  router: {
+    push: jest.fn(),
+    replace: jest.fn(),
+    back: jest.fn(),
+  },
+  useRouter: () => ({
+    push: jest.fn(),
+    replace: jest.fn(),
+    back: jest.fn(),
+  }),
+}));
+
+jest.mock('@expo/vector-icons', () => ({
+  Ionicons: () => null,
+}));
+
 jest.mock('expo-haptics', () => ({
   impactAsync: jest.fn(),
   notificationAsync: jest.fn(),

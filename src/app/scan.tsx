@@ -9,7 +9,7 @@ import { useUserStore } from '@/stores/useUserStore';
 import { useScanPlanMutation } from '@/services/queries';
 import { LoadingOverlay, AnimatedEntry } from '@/components/ui';
 import { Camera, FileText, ScanLine, CloseIcon, ChevronRight } from '@/components/ui/icons';
-import { radius, spacing, typography, useThemeColors } from '@/theme';
+import { useThemeColors, type PaletteColors, radius, spacing, typography } from '@/theme';
 import { logger } from '@/utils/logger';
 import { STRINGS } from '@/constants/strings';
 
@@ -34,6 +34,7 @@ function inferName(
 
 export default function ScanScreen() {
   const colors = useThemeColors();
+  const styles = createStyles(colors);
   const setPlanScanned = useUserStore((state) => state.setPlanScanned);
   const mutation = useScanPlanMutation();
   const [error, setError] = useState<string | null>(null);
@@ -86,18 +87,18 @@ export default function ScanScreen() {
   const loading = mutation.isPending;
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={styles.safe}>
       <View style={styles.header}>
         <View style={{ flex: 1 }}>
-          <Text style={[styles.eyebrow, { color: colors.primary }]}>Escanear</Text>
-          <Text style={[styles.title, { color: colors.textPrimary }]}>{STRINGS.scan.title}</Text>
+          <Text style={styles.eyebrow}>{STRINGS.scan.title}</Text>
+          <Text style={styles.title}>{STRINGS.scan.title}</Text>
         </View>
-        <Pressable onPress={() => router.back()} style={[styles.closeBtn, { backgroundColor: colors.surface, borderColor: colors.border }]} accessibilityLabel="Cerrar">
+        <Pressable onPress={() => router.back()} style={styles.closeBtn} accessibilityLabel="Cerrar">
           <CloseIcon size={20} color={colors.textPrimary} />
         </Pressable>
       </View>
 
-      <Text style={[styles.subtitle, { color: colors.textSecondary }]}>{STRINGS.scan.subtitle}</Text>
+      <Text style={styles.subtitle}>{STRINGS.scan.subtitle}</Text>
 
       <View style={styles.options}>
         {[
@@ -126,12 +127,12 @@ export default function ScanScreen() {
           <AnimatedEntry key={i} delay={i * 80}>
             <Pressable
               onPress={opt.onPress}
-              style={({ pressed }) => [styles.option, { backgroundColor: colors.surface, borderColor: colors.border }, pressed && { transform: [{ scale: 0.98 }] }]}
+              style={({ pressed }) => [styles.option, pressed && styles.optionPressed]}
             >
               <View style={[styles.optionIcon, { backgroundColor: opt.iconBg }]}>{opt.icon}</View>
               <View style={{ flex: 1 }}>
-                <Text style={[styles.optionTitle, { color: colors.textPrimary }]}>{opt.title}</Text>
-                <Text style={[styles.optionSubtitle, { color: colors.textSecondary }]}>{opt.subtitle}</Text>
+                <Text style={styles.optionTitle}>{opt.title}</Text>
+                <Text style={styles.optionSubtitle}>{opt.subtitle}</Text>
               </View>
               <ChevronRight size={20} color={colors.textDisabled} />
             </Pressable>
@@ -139,7 +140,7 @@ export default function ScanScreen() {
         ))}
       </View>
 
-      {error ? <Text style={[styles.error, { color: colors.error }]}>{error}</Text> : null}
+      {error ? <Text style={styles.error}>{error}</Text> : null}
 
       <LoadingOverlay
         visible={loading}
@@ -150,37 +151,45 @@ export default function ScanScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, paddingHorizontal: spacing.lg, paddingTop: spacing.md },
-  header: { flexDirection: 'row', alignItems: 'flex-start', paddingVertical: spacing.md, gap: spacing.md },
-  eyebrow: { ...typography.overline, marginBottom: 4 },
-  title: { ...typography.title, fontFamily: 'Fraunces_500Medium' },
-  subtitle: { ...typography.bodySecondary, marginBottom: spacing.lg },
-  closeBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  options: { gap: spacing.md },
-  option: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: spacing.md,
-    borderRadius: radius.card,
-    gap: spacing.md,
-    borderWidth: 1,
-  },
-  optionIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  optionTitle: { ...typography.bodyMedium },
-  optionSubtitle: { ...typography.caption, marginTop: 2 },
-  error: { ...typography.bodySecondary, textAlign: 'center', marginTop: spacing.lg },
-});
+function createStyles(colors: PaletteColors) {
+  return StyleSheet.create({
+    safe: { flex: 1, paddingHorizontal: spacing.lg, paddingTop: spacing.md, backgroundColor: colors.background },
+    header: { flexDirection: 'row', alignItems: 'flex-start', paddingVertical: spacing.md, gap: spacing.md },
+    eyebrow: { ...typography.overline, color: colors.primary, marginBottom: 4 },
+    title: { ...typography.title, color: colors.textPrimary, fontFamily: 'Fraunces_500Medium' },
+    subtitle: { ...typography.bodySecondary, color: colors.textSecondary, marginBottom: spacing.lg },
+    closeBtn: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.surface,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    options: { gap: spacing.md },
+    option: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: spacing.md,
+      borderRadius: radius.card,
+      gap: spacing.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.surface,
+    },
+    optionPressed: { transform: [{ scale: 0.98 }] },
+    optionIcon: {
+      width: 44,
+      height: 44,
+      borderRadius: 14,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    optionTitle: { ...typography.bodyMedium, color: colors.textPrimary },
+    optionSubtitle: { ...typography.caption, color: colors.textSecondary, marginTop: 2 },
+    error: { ...typography.bodySecondary, color: colors.error, textAlign: 'center', marginTop: spacing.lg },
+  });
+}
+

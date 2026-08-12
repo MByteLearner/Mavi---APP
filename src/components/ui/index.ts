@@ -38,6 +38,8 @@ export { GoalCard } from './GoalCard';
 export type { GoalCardProps } from './GoalCard';
 export { ProfileCard } from './ProfileCard';
 export type { ProfileCardProps } from './ProfileCard';
+export { GuidelineCard } from './GuidelineCard';
+export type { GuidelineCardProps } from './GuidelineCard';
 export { AnimatedEntry } from './AnimatedEntry';
 export type { AnimatedEntryProps } from './AnimatedEntry';
 export {
