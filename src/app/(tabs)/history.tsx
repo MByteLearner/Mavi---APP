@@ -12,7 +12,8 @@ import {
   AnimatedEntry,
 } from '@/components/ui';
 import { Flame, Scale } from '@/components/ui/icons';
-import { palette, spacing, typography } from '@/theme';
+import { palette, spacing, typography , useThemeColors } from '@/theme';
+
 
 interface HistoryDay {
   date: string;
@@ -42,8 +43,6 @@ const historyData: HistoryDay[] = [
     ],
   },
 ];
-
-import { useThemeColors } from '@/theme';
 
 export default function HistoryScreen() {
   const colors = useThemeColors();

@@ -16,6 +16,24 @@ jest.mock('expo-image-manipulator', () => ({
   SaveFormat: { JPEG: 'jpeg' },
 }));
 
+jest.mock('expo-secure-store', () => ({
+  getItemAsync: jest.fn(async () => null),
+  setItemAsync: jest.fn(async () => {}),
+  deleteItemAsync: jest.fn(async () => {}),
+}));
+
+jest.mock('expo-constants', () => ({
+  __esModule: true,
+  default: {
+    expoConfig: {
+      extra: {
+        apiUrl: 'http://localhost:3000/api',
+        useMocks: true,
+      },
+    },
+  },
+}));
+
 jest.mock('react-native-ble-plx', () => ({
   BleManager: jest.fn().mockImplementation(() => ({
     state: jest.fn().mockResolvedValue('PoweredOn'),
@@ -26,15 +44,15 @@ jest.mock('react-native-ble-plx', () => ({
 }));
 
 jest.mock('@react-native-async-storage/async-storage', () => {
-  const storage: Record<string, string> = {};
+  const storage = {};
   return {
     __esModule: true,
     default: {
-      getItem: jest.fn(async (k: string) => storage[k] ?? null),
-      setItem: jest.fn(async (k: string, v: string) => {
+      getItem: jest.fn(async (k) => storage[k] ?? null),
+      setItem: jest.fn(async (k, v) => {
         storage[k] = v;
       }),
-      removeItem: jest.fn(async (k: string) => {
+      removeItem: jest.fn(async (k) => {
         delete storage[k];
       }),
       clear: jest.fn(async () => {
@@ -45,3 +63,4 @@ jest.mock('@react-native-async-storage/async-storage', () => {
 });
 
 global.__reanimatedWorkletInit = jest.fn();
+

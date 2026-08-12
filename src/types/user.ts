@@ -1,8 +1,16 @@
+import type { Guideline } from './plan';
+
 export interface UserProfile {
   id: string;
   name: string;
-  goal: 'lose' | 'maintain' | 'gain';
-  dailyCalories: number;
+  email?: string;
+  goal?: 'lose' | 'maintain' | 'gain';
+  goals?: string[];
+  allergies?: string[];
+  dailyCalories?: number;
+  streak?: number;
+  createdAt?: string;
+  guideline?: Guideline | null;
 }
 
 export interface UserPersistedState {
@@ -12,3 +20,4 @@ export interface UserPersistedState {
   planId: string | null;
   profile: UserProfile | null;
 }
+

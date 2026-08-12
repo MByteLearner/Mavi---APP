@@ -1,4 +1,4 @@
-import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import { View, type StyleProp, type ViewStyle } from 'react-native';
 import type { ReactNode } from 'react';
 import { radius, shadow, spacing, useThemeColors } from '@/theme';
 

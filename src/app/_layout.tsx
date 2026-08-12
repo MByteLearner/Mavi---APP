@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Stack } from 'expo-router';
+import { Stack , useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, Component, type ErrorInfo, type ReactNode } from 'react';
@@ -21,12 +21,13 @@ import {
   Geist_700Bold,
 } from '@expo-google-fonts/geist';
 
-import { useRouter, useSegments } from 'expo-router';
 
 import { ToastContainer } from '@/components/ui/Toast';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { palette, typography } from '@/theme';
 import { logger } from '@/utils/logger';
+
+import { useThemeStore } from '@/stores/useThemeStore';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -86,8 +87,6 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 
   return <>{children}</>;
 }
-
-import { useThemeStore } from '@/stores/useThemeStore';
 
 export default function RootLayout() {
   const resolved = useThemeStore((s) => s.resolved);

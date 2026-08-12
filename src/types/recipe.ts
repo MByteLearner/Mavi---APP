@@ -7,11 +7,20 @@ export interface Ingredient {
   unit: WeightUnit;
 }
 
+export interface BackendRecipe {
+  id: string;
+  name: string;
+  ingredients: string[];
+  base_calories: number;
+}
+
 export interface Recipe {
   id: string;
   name: string;
   description: string;
   emoji: string;
   calories?: number;
+  base_calories?: number;
   ingredients: Ingredient[];
 }
+

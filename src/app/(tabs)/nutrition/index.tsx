@@ -13,9 +13,8 @@ import {
   AnimatedEntry,
 } from '@/components/ui';
 import { ChevronRight } from '@/components/ui/icons';
-import { palette, radius, spacing, typography } from '@/theme';
+import { palette, radius, spacing, typography , useThemeColors } from '@/theme';
 
-import { useThemeColors } from '@/theme';
 
 export default function NutritionScreen() {
   const colors = useThemeColors();
