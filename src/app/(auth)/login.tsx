@@ -6,7 +6,7 @@ import { router } from 'expo-router';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { Button, Input, Card, AnimatedEntry } from '@/components/ui';
 import { Leaf, Mail, Lock } from '@/components/ui/icons';
-import { radius, shadow, spacing, typography, useThemeColors } from '@/theme';
+import { shadow, spacing, typography, useThemeColors } from '@/theme';
 import { toast } from '@/components/ui/Toast';
 
 export default function LoginScreen() {

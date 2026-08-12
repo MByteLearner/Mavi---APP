@@ -1,9 +1,9 @@
+import { scanPlan } from '@/services/planParser';
+import { RECIPES } from '@/constants/recipes';
+
 jest.mock('@/services/config', () => ({
   API_CONFIG: { baseUrl: 'http://test', useMocks: true, timeoutMs: 1000 },
 }));
-
-import { scanPlan } from '@/services/planParser';
-import { RECIPES } from '@/constants/recipes';
 
 describe('planParser.scanPlan', () => {
   it('returns a plan and suggested recipes from a PDF input', async () => {

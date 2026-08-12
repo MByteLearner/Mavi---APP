@@ -15,12 +15,12 @@ import {
   Edit,
   Heart,
   Target,
-  LogOut,
   Moon,
   Sun,
   Contrast,
 } from '@/components/ui/icons';
-import { palette, radius, spacing, typography } from '@/theme';
+import { radius, spacing, typography, useThemeColors } from '@/theme';
+
 
 const THEME_OPTIONS: { mode: ThemeMode; label: string; icon: 'sun' | 'moon' | 'contrast' }[] = [
   { mode: 'light', label: 'Claro', icon: 'sun' },
@@ -35,8 +35,6 @@ const ThemeIcon = ({ name, size, color }: { name: string; size: number; color: s
     default: return <Contrast size={size} color={color} />;
   }
 };
-
-import { useThemeColors } from '@/theme';
 
 export default function ProfileScreen() {
   const colors = useThemeColors();

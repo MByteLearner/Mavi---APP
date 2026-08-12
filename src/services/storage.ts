@@ -6,6 +6,7 @@ export const StorageKeys = {
   User: 'mavi.user',
   Session: 'mavi.session',
   LastDevice: 'mavi.lastDevice',
+  AuthToken: 'mavi.authToken',
 } as const;
 
 export const storage = {
@@ -38,7 +39,7 @@ export const storage = {
 export const secureStorage = {
   async get(key: string): Promise<string | null> {
     try {
-      if (Platform.OS === 'web') return null;
+      if (Platform.OS === 'web') return await AsyncStorage.getItem(key);
       return await SecureStore.getItemAsync(key);
     } catch {
       return null;
@@ -47,7 +48,10 @@ export const secureStorage = {
 
   async set(key: string, value: string): Promise<void> {
     try {
-      if (Platform.OS === 'web') return;
+      if (Platform.OS === 'web') {
+        await AsyncStorage.setItem(key, value);
+        return;
+      }
       await SecureStore.setItemAsync(key, value);
     } catch {
       // best-effort
@@ -56,10 +60,26 @@ export const secureStorage = {
 
   async remove(key: string): Promise<void> {
     try {
-      if (Platform.OS === 'web') return;
+      if (Platform.OS === 'web') {
+        await AsyncStorage.removeItem(key);
+        return;
+      }
       await SecureStore.deleteItemAsync(key);
     } catch {
       // best-effort
     }
   },
 };
+
+export async function saveAuthToken(token: string): Promise<void> {
+  await secureStorage.set(StorageKeys.AuthToken, token);
+}
+
+export async function getAuthToken(): Promise<string | null> {
+  return secureStorage.get(StorageKeys.AuthToken);
+}
+
+export async function removeAuthToken(): Promise<void> {
+  await secureStorage.remove(StorageKeys.AuthToken);
+}
+

@@ -35,6 +35,13 @@ function mockScan(input: ScanPlanInput): ScanPlanResult {
   };
 }
 
+export interface BackendDietUploadResponse {
+  id: string;
+  userId: string;
+  allowedIngredients: string[];
+  restrictions: string[];
+}
+
 export async function scanPlan(input: ScanPlanInput): Promise<ScanPlanResult> {
   logger.debug('planParser', 'scanPlan called', { mimeType: input.mimeType, fileName: input.fileName });
 
@@ -46,18 +53,31 @@ export async function scanPlan(input: ScanPlanInput): Promise<ScanPlanResult> {
   const formData = new FormData();
   formData.append('file', {
     uri: input.uri,
-    name: input.fileName ?? 'plan',
+    name: input.fileName ?? (input.mimeType === 'application/pdf' ? 'plan.pdf' : 'plan.jpg'),
     type: input.mimeType,
   } as unknown as Blob);
 
-  return apiRequest<ScanPlanResult>('/plans/scan', {
+  const res = await apiRequest<BackendDietUploadResponse>('/diets/upload', {
     method: 'POST',
     body: formData,
     headers: { 'Content-Type': 'multipart/form-data' },
   });
+
+  return {
+    plan: {
+      id: res.id,
+      source: input.mimeType === 'application/pdf' ? 'pdf' : 'image',
+      scannedAt: new Date().toISOString(),
+      restrictions: res.restrictions ?? [],
+      suggestedRecipeIds: RECIPES.map((r) => r.id),
+      allowedIngredients: res.allowedIngredients ?? [],
+    },
+    suggestedRecipes: RECIPES,
+  };
 }
 
 export function getRecipesForPlan(planId: string | null): Recipe[] {
   if (!planId) return RECIPES;
   return RECIPES;
 }
+

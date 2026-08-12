@@ -1,8 +1,8 @@
+import { validateMeal } from '@/services/aiValidator';
+
 jest.mock('@/services/config', () => ({
   API_CONFIG: { baseUrl: 'http://test', useMocks: true, timeoutMs: 1000 },
 }));
-
-import { validateMeal } from '@/services/aiValidator';
 
 describe('aiValidator.validateMeal', () => {
   it('returns a result with success and confidence', async () => {

@@ -23,9 +23,8 @@ import {
   Leaf,
   BookOpen,
 } from '@/components/ui/icons';
-import { palette, radius, shadow, spacing, typography } from '@/theme';
+import { palette, radius, shadow, spacing, typography , useThemeColors } from '@/theme';
 
-import { useThemeColors } from '@/theme';
 
 export default function HomeScreen() {
   const colors = useThemeColors();
