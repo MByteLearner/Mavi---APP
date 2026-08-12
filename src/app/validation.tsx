@@ -23,7 +23,7 @@ import { toast } from '@/components/ui/Toast';
 import { Button } from '@/components/ui/Button';
 import { logger } from '@/utils/logger';
 import { STRINGS } from '@/constants/strings';
-import { palette, spacing, typography } from '@/theme';
+import { useThemeColors, type PaletteColors, spacing, typography } from '@/theme';
 import type { CameraCapture } from '@/types/validation';
 
 type Phase = 'camera' | 'processing' | 'success';
@@ -48,6 +48,8 @@ async function compressPhoto(uri: string): Promise<CameraCapture | null> {
 }
 
 export default function ValidationScreen() {
+  const colors = useThemeColors();
+  const styles = createStyles(colors);
   const [phase, setPhase] = useState<Phase>('camera');
   const [error, setError] = useState<string | null>(null);
   const registerCompletion = useUserStore((s) => s.registerCompletion);
@@ -126,7 +128,7 @@ export default function ValidationScreen() {
       <SafeAreaView style={styles.safe}>
         <View style={styles.processingWrapper}>
           <View style={styles.processingIcon}>
-            <Sparkles size={32} color={palette.primary} />
+            <Sparkles size={32} color={colors.primary} />
           </View>
           <Text style={styles.processingTitle}>{STRINGS.validation.processing}</Text>
           <Text style={styles.processingBody}>{STRINGS.validation.processingSubtitle}</Text>
@@ -141,7 +143,7 @@ export default function ValidationScreen() {
         <View style={styles.successWrapper}>
           <Animated.View style={animatedCheck}>
             <View style={styles.successIcon}>
-              <CheckCircle size={48} color={palette.textInverse} />
+              <CheckCircle size={48} color={colors.textInverse} />
             </View>
           </Animated.View>
           <Animated.View entering={FadeIn.delay(300)} style={styles.successText}>
@@ -174,32 +176,35 @@ export default function ValidationScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: palette.background },
-  processingWrapper: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: spacing.lg, gap: spacing.md },
-  processingIcon: {
-    width: 88,
-    height: 88,
-    borderRadius: 44,
-    backgroundColor: '#FFEDED',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.md,
-  },
-  processingTitle: { ...typography.titleSecondary, color: palette.textPrimary, fontWeight: '600' },
-  processingBody: { ...typography.bodySecondary, color: palette.textSecondary, textAlign: 'center', maxWidth: 320 },
-  successWrapper: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: spacing.lg, gap: spacing.lg },
-  successIcon: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    backgroundColor: palette.success,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  successText: { alignItems: 'center' },
-  successTitle: { ...typography.title, color: palette.textPrimary, fontWeight: '700', textAlign: 'center' },
-  successBody: { ...typography.body, color: palette.textSecondary, textAlign: 'center', marginTop: spacing.xs },
-  errorBanner: { position: 'absolute', top: 80, left: spacing.lg, right: spacing.lg, zIndex: 10 },
-  errorBannerText: { ...typography.bodyMedium, color: palette.textPrimary, textAlign: 'center' },
-});
+function createStyles(colors: PaletteColors) {
+  return StyleSheet.create({
+    safe: { flex: 1, backgroundColor: colors.background },
+    processingWrapper: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: spacing.lg, gap: spacing.md },
+    processingIcon: {
+      width: 88,
+      height: 88,
+      borderRadius: 44,
+      backgroundColor: colors.primarySoft,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: spacing.md,
+    },
+    processingTitle: { ...typography.titleSecondary, color: colors.textPrimary, fontWeight: '600' },
+    processingBody: { ...typography.bodySecondary, color: colors.textSecondary, textAlign: 'center', maxWidth: 320 },
+    successWrapper: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: spacing.lg, gap: spacing.lg },
+    successIcon: {
+      width: 96,
+      height: 96,
+      borderRadius: 48,
+      backgroundColor: colors.success,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    successText: { alignItems: 'center' },
+    successTitle: { ...typography.title, color: colors.textPrimary, fontWeight: '700', textAlign: 'center' },
+    successBody: { ...typography.body, color: colors.textSecondary, textAlign: 'center', marginTop: spacing.xs },
+    errorBanner: { position: 'absolute', top: 80, left: spacing.lg, right: spacing.lg, zIndex: 10 },
+    errorBannerText: { ...typography.bodyMedium, color: colors.textPrimary, textAlign: 'center' },
+  });
+}
+
