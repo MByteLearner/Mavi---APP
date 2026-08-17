@@ -14,15 +14,21 @@ export interface RequestOptions {
   body?: unknown;
   signal?: AbortSignal;
   headers?: Record<string, string>;
+  timeoutMs?: number;
 }
 
 export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
-  const { method = 'GET', body, signal, headers = {} } = options;
+  const { method = 'GET', body, signal, headers = {}, timeoutMs = API_CONFIG.timeoutMs } = options;
   const url = `${API_CONFIG.baseUrl}${path}`;
 
   const token = await getAuthToken();
 
-  const isFormData = typeof FormData !== 'undefined' && body instanceof FormData;
+  const isFormData =
+    body != null &&
+    (body instanceof FormData ||
+      (typeof body === 'object' &&
+        typeof (body as Record<string, unknown>).append === 'function' &&
+        '_parts' in (body as Record<string, unknown>)));
 
   const defaultHeaders: Record<string, string> = {
     Accept: 'application/json',
@@ -31,22 +37,25 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
   };
 
 
-  if (!isFormData && !defaultHeaders['Content-Type']) {
+  if (isFormData) {
+    // Eliminar cualquier variante de Content-Type/content-type para que el fetch nativo de Android/iOS inserte el boundary multipart
+    Object.keys(defaultHeaders).forEach((key) => {
+      if (key.toLowerCase() === 'content-type') {
+        delete defaultHeaders[key];
+      }
+    });
+  } else if (!defaultHeaders['Content-Type'] && !defaultHeaders['content-type']) {
     defaultHeaders['Content-Type'] = 'application/json';
   }
 
-  // If header Content-Type is multipart/form-data, delete it so fetch can set boundary automatically
-  if (isFormData && defaultHeaders['Content-Type'] === 'multipart/form-data') {
-    delete defaultHeaders['Content-Type'];
-  }
-
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), API_CONFIG.timeoutMs);
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
   if (signal) {
     signal.addEventListener('abort', () => controller.abort());
   }
 
   try {
+    console.log(`[API Request] ${method} ${url}`);
     const response = await fetch(url, {
       method,
       signal: controller.signal,
@@ -55,12 +64,23 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
     });
 
     const text = await response.text();
-    const data = text ? (JSON.parse(text) as unknown) : null;
+    let data: unknown = null;
+    if (text) {
+      try {
+        data = JSON.parse(text);
+      } catch {
+        data = text;
+      }
+    }
 
     if (!response.ok) {
       const errorMsg =
-        data && typeof data === 'object' && 'message' in data
+        data && typeof data === 'object' && 'error' in data
+          ? String((data as { error: unknown }).error)
+          : data && typeof data === 'object' && 'message' in data
           ? String((data as { message: unknown }).message)
+          : typeof data === 'string' && data.includes('<html')
+          ? `HTTP ${response.status} (${response.statusText})`
           : `Request failed: ${response.status}`;
       throw new ApiError(response.status, errorMsg, data);
     }
@@ -73,5 +93,61 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
   } finally {
     clearTimeout(timeout);
   }
+}
+
+export async function uploadFile<T>(
+  path: string,
+  formData: FormData,
+  options: { timeoutMs?: number } = {}
+): Promise<T> {
+  const url = `${API_CONFIG.baseUrl}${path}`;
+  const token = await getAuthToken();
+  const timeoutMs = options.timeoutMs ?? API_CONFIG.timeoutMs;
+
+  return new Promise<T>((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', url);
+    xhr.timeout = timeoutMs;
+
+    xhr.setRequestHeader('Accept', 'application/json');
+    if (token) {
+      xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+    }
+
+    xhr.onload = () => {
+      const text = xhr.responseText;
+      let data: unknown = null;
+      if (text) {
+        try {
+          data = JSON.parse(text);
+        } catch {
+          data = text;
+        }
+      }
+
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve(data as T);
+      } else {
+        const errorMsg =
+          data && typeof data === 'object' && 'error' in data
+            ? String((data as { error: unknown }).error)
+            : `Request failed: ${xhr.status}`;
+        reject(new ApiError(xhr.status, errorMsg, data));
+      }
+    };
+
+    xhr.onerror = () => {
+      logger.error('api', 'upload failed network error', { path });
+      reject(new ApiError(0, 'Network error during file upload'));
+    };
+
+    xhr.ontimeout = () => {
+      logger.error('api', 'upload timed out', { path });
+      reject(new ApiError(0, 'Upload timed out'));
+    };
+
+    console.log(`[API Upload XHR] POST ${url}`);
+    xhr.send(formData);
+  });
 }
 

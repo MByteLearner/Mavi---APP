@@ -6,6 +6,7 @@ import GlassView from 'expo-glass-effect/build/GlassView';
 import {
   Home,
   BookOpen,
+  Sparkles,
   TrendingUp,
   Person,
 } from '@/components/ui/icons';
@@ -105,7 +106,12 @@ export default function TabLayout() {
       <Tabs.Screen
         name="ia"
         options={{
-          href: null,
+          tabBarIcon: ({ color, focused }) => (
+            <View style={styles.iconContainer}>
+              <Sparkles size={24} color={color} />
+              {focused && <View style={styles.activeDot} />}
+            </View>
+          ),
         }}
       />
       <Tabs.Screen

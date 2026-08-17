@@ -34,15 +34,15 @@ export default function RegisterScreen() {
     if (!validate()) return;
     setLoading(true);
     try {
-      const ok = await register({ name, email, password, goal: 'maintain', restrictions: [] });
-      if (ok) {
+      const res = await register({ name, email, password, goal: 'maintain', restrictions: [] });
+      if (res.success) {
         toast.success('¡Registro exitoso!');
         router.replace('/(tabs)');
       } else {
-        toast.error('No se pudo registrar la cuenta');
+        toast.error('No se pudo unir: error en el servidor');
       }
     } catch {
-      toast.error('Error durante el registro');
+      toast.error('No se pudo unir: error en el servidor');
     } finally {
       setLoading(false);
     }

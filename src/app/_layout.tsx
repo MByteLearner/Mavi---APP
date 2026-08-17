@@ -144,6 +144,10 @@ export default function RootLayout() {
                   name="validation"
                   options={{ presentation: 'fullScreenModal', animation: 'slide_from_bottom' }}
                 />
+                <Stack.Screen
+                  name="chat-ia"
+                  options={{ presentation: 'card', animation: 'slide_from_right' }}
+                />
               </Stack>
               </AuthGuard>
               <ToastContainer />

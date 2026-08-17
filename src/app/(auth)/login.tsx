@@ -31,15 +31,15 @@ export default function LoginScreen() {
     if (!validate()) return;
     setLoading(true);
     try {
-      const ok = await login(email, password);
-      if (ok) {
+      const res = await login(email, password);
+      if (res.success) {
         toast.success('¡Bienvenido de nuevo!');
         router.replace('/(tabs)');
       } else {
-        toast.error('Credenciales incorrectas');
+        toast.error('No se pudo unir: error en el servidor');
       }
     } catch {
-      toast.error('Error al iniciar sesión');
+      toast.error('No se pudo unir: error en el servidor');
     } finally {
       setLoading(false);
     }

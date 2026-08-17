@@ -8,7 +8,7 @@ import { useUserStore } from '@/stores/useUserStore';
 import { useThemeStore, type ThemeMode } from '@/stores/useThemeStore';
 import { useHaptics } from '@/hooks/useHaptics';
 import { toast } from '@/components/ui/Toast';
-import { ProfileCard, GuidelineCard, Button, Chip, AnimatedEntry } from '@/components/ui';
+import { ProfileCard, GuidelineCard, Button, Chip, EmptyState, AnimatedEntry } from '@/components/ui';
 import {
   ChevronRight,
   Notification,
@@ -50,9 +50,9 @@ export default function ProfileScreen() {
   const streak = useUserStore((s) => s.streak);
   const haptics = useHaptics();
 
-  const activeName = userProfile?.name ?? user?.name ?? 'María García';
+  const activeName = userProfile?.name ?? user?.name ?? 'Usuario';
   const activeGoal = userProfile?.goal ?? user?.goal ?? 'maintain';
-  const activeGoals = userProfile?.goals ?? user?.goals ?? ['Mantener peso saludable', 'Comer 5 veces al día'];
+  const activeGoals = userProfile?.goals ?? user?.goals ?? ['Mantener peso saludable'];
   const goalLabel =
     activeGoal === 'lose'
       ? 'Perder grasa'
@@ -78,6 +78,91 @@ export default function ProfileScreen() {
     };
     toast.info(labels[mode]);
   };
+
+  const hasPlan = hasScannedPlan || Boolean(user?.guideline);
+
+  if (!hasPlan) {
+    return (
+      <SafeAreaView style={styles.safe} edges={['top']}>
+        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+          <AnimatedEntry>
+            <View style={styles.header}>
+              <Text style={styles.title}>Perfil</Text>
+            </View>
+          </AnimatedEntry>
+          <EmptyState
+            illustration="profile"
+            title="Sin información de perfil"
+            body="Subí o escaneá tu plan alimenticio para generar tu perfil de nutrición y pautas médicas."
+            action={
+              <Button
+                label="Escanear plan"
+                size="md"
+                fullWidth={false}
+                onPress={() => router.push('/scan')}
+              />
+            }
+          />
+
+          {/* Apariencia — Toggle Dark/Light/System */}
+          <AnimatedEntry delay={160}>
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Apariencia</Text>
+              <View style={styles.themeRow}>
+                {THEME_OPTIONS.map((opt) => {
+                  const isActive = themeMode === opt.mode;
+                  return (
+                    <Pressable
+                      key={opt.mode}
+                      disabled={isActive}
+                      style={[
+                        styles.themeOption,
+                        isActive && styles.themeOptionActive,
+                      ]}
+                      onPress={() => handleThemeChange(opt.mode)}
+                      accessibilityRole="button"
+                      accessibilityState={{ selected: isActive, disabled: isActive }}
+                      accessibilityLabel={`Tema ${opt.label}`}
+                    >
+                      <View
+                        style={[
+                          styles.themeIconBg,
+                          isActive && styles.themeIconBgActive,
+                        ]}
+                      >
+                        <ThemeIcon
+                          name={opt.icon}
+                          size={20}
+                          color={isActive ? colors.textInverse : colors.textSecondary}
+                        />
+                      </View>
+                      <Text
+                        style={[
+                          styles.themeLabel,
+                          isActive && styles.themeLabelActive,
+                        ]}
+                      >
+                        {opt.label}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            </View>
+          </AnimatedEntry>
+
+          <View style={{ marginTop: spacing.lg }}>
+            <Button
+              label="Cerrar sesión"
+              variant="outlined"
+              fullWidth
+              onPress={handleLogout}
+            />
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>

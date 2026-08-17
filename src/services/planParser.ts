@@ -2,7 +2,7 @@ import { RECIPES } from '@/constants/recipes';
 import type { ScannedPlan } from '@/types/plan';
 import type { Recipe } from '@/types/recipe';
 import { logger } from '@/utils/logger';
-import { apiRequest } from './api';
+import { apiRequest, uploadFile } from './api';
 import { API_CONFIG } from './config';
 
 const MOCK_LATENCY_MS = 1_500;
@@ -51,17 +51,19 @@ export async function scanPlan(input: ScanPlanInput): Promise<ScanPlanResult> {
   }
 
   const formData = new FormData();
-  formData.append('file', {
-    uri: input.uri,
-    name: input.fileName ?? (input.mimeType === 'application/pdf' ? 'plan.pdf' : 'plan.jpg'),
-    type: input.mimeType,
-  } as unknown as Blob);
+  const fileUri = String(input.uri || '');
+  const rawName = String(input.fileName || (input.mimeType === 'application/pdf' ? 'plan.pdf' : 'plan.jpg'));
+  const fileName = rawName.replace(/[^a-zA-Z0-9._-]/g, '_');
+  const fileType = String(input.mimeType || (fileUri.endsWith('.pdf') ? 'application/pdf' : 'image/jpeg'));
 
-  const res = await apiRequest<BackendDietUploadResponse>('/diets/upload', {
-    method: 'POST',
-    body: formData,
-    headers: { 'Content-Type': 'multipart/form-data' },
-  });
+  const fileObj = {
+    uri: fileUri,
+    name: fileName,
+    type: fileType,
+  };
+  formData.append('file', fileObj as unknown as Blob);
+
+  const res = await uploadFile<BackendDietUploadResponse>('/diets/upload', formData);
 
   return {
     plan: {

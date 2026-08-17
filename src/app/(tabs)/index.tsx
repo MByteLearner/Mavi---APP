@@ -22,6 +22,7 @@ import {
   Scale,
   Leaf,
   BookOpen,
+  FileText,
 } from '@/components/ui/icons';
 import { useThemeColors, type PaletteColors, radius, shadow, spacing, typography } from '@/theme';
 
@@ -29,9 +30,61 @@ export default function HomeScreen() {
   const colors = useThemeColors();
   const styles = createStyles(colors);
   const streak = useUserStore((state) => state.streak);
+  const hasScannedPlan = useUserStore((state) => state.hasScannedPlan);
   const hasActiveRecipe = useSessionStore((state) => state.activeRecipeId !== null);
   const user = useAuthStore((s) => s.user);
   const userName = user?.name?.split(' ')[0] ?? 'Usuario';
+
+  const hasPlan = hasScannedPlan || Boolean(user?.guideline);
+
+  if (!hasPlan) {
+    return (
+      <SafeAreaView style={styles.safe} edges={['top']}>
+        <ScrollView
+          contentContainerStyle={styles.emptyContainer}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Header */}
+          <AnimatedEntry delay={0}>
+            <View style={styles.appBar}>
+              <View style={styles.appBarLeft}>
+                <View style={styles.logoMark}>
+                  <Leaf size={20} color={colors.textInverse} />
+                </View>
+                <View>
+                  <Text style={styles.greeting}>Hola, {userName} 👋</Text>
+                  <Text style={styles.subGreeting}>Bienvenido a MAVI</Text>
+                </View>
+              </View>
+            </View>
+          </AnimatedEntry>
+
+          {/* Estado Inicial Solicitando Plan Alimenticio */}
+          <AnimatedEntry delay={100}>
+            <View style={styles.welcomeCard}>
+              <View style={styles.welcomeIconWrapper}>
+                <FileText size={38} color={colors.primary} />
+              </View>
+              <Text style={styles.welcomeTitle}>Cargá tu Plan Alimenticio</Text>
+              <Text style={styles.welcomeDescription}>
+                Para poder sugerirte recetas personalizadas y realizar el seguimiento de tu nutrición, por favor escaneá o subí tu plan médico nutricional.
+              </Text>
+
+              <Pressable
+                style={styles.scanActionBtn}
+                onPress={() => router.push('/scan')}
+                accessibilityRole="button"
+                accessibilityLabel="Subir o Escanear Plan Alimenticio"
+              >
+                <ScanLine size={20} color={colors.textInverse} />
+                <Text style={styles.scanActionBtnText}>Escanear o Subir Plan</Text>
+              </Pressable>
+            </View>
+          </AnimatedEntry>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
@@ -154,7 +207,7 @@ export default function HomeScreen() {
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Para vos hoy</Text>
-              <Pressable hitSlop={8} onPress={() => router.push('/(tabs)/ia')}>
+              <Pressable hitSlop={8} onPress={() => router.push('/chat-ia')}>
                 <Text style={styles.sectionAction}>Chat con IA</Text>
               </Pressable>
             </View>
@@ -430,6 +483,64 @@ function createStyles(colors: PaletteColors) {
       alignItems: 'center',
       justifyContent: 'center',
       ...shadow.orange,
+    },
+
+    emptyContainer: {
+      flexGrow: 1,
+      paddingHorizontal: spacing.lg,
+      paddingBottom: spacing.xl + 80,
+      justifyContent: 'center',
+    },
+    welcomeCard: {
+      backgroundColor: colors.surface,
+      borderColor: colors.border,
+      borderWidth: 1,
+      borderRadius: radius.card,
+      padding: spacing.xl,
+      alignItems: 'center',
+      gap: spacing.md,
+      marginTop: spacing.md,
+      ...shadow.sm,
+    },
+    welcomeIconWrapper: {
+      width: 76,
+      height: 76,
+      borderRadius: 24,
+      backgroundColor: colors.primarySoft,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: spacing.xs,
+    },
+    welcomeTitle: {
+      ...typography.titleSecondary,
+      color: colors.textPrimary,
+      fontFamily: 'Fraunces_600SemiBold',
+      fontSize: 22,
+      textAlign: 'center',
+    },
+    welcomeDescription: {
+      ...typography.bodyMedium,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      lineHeight: 22,
+    },
+    scanActionBtn: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: spacing.sm,
+      backgroundColor: colors.primary,
+      paddingHorizontal: spacing.xl,
+      paddingVertical: spacing.md + 2,
+      borderRadius: radius.pill,
+      width: '100%',
+      marginTop: spacing.sm,
+      ...shadow.sm,
+    },
+    scanActionBtnText: {
+      ...typography.bodyMedium,
+      color: colors.textInverse,
+      fontWeight: '600',
     },
   });
 }

@@ -22,7 +22,7 @@ export function Chip({ label, tone = 'neutral', icon, style }: ChipProps) {
     info: { bg: colors.infoSoft, text: colors.info },
   };
 
-  const t = toneStyles[tone];
+  const t = toneStyles[tone] ?? toneStyles.neutral;
   return (
     <View style={[styles.chip, { backgroundColor: t.bg }, style]}>
       {icon}

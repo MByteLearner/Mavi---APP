@@ -15,14 +15,19 @@ import {
 import { ChevronRight } from '@/components/ui/icons';
 import { useThemeColors, type PaletteColors, radius, spacing, typography } from '@/theme';
 
+import { useAuthStore } from '@/stores/useAuthStore';
+
 export default function NutritionScreen() {
   const colors = useThemeColors();
   const styles = createStyles(colors);
   const hasScannedPlan = useUserStore((state) => state.hasScannedPlan);
+  const user = useAuthStore((s) => s.user);
   const activeRecipeId = useSessionStore((state) => state.activeRecipeId);
   const startWeighing = useSessionStore((state) => state.startWeighing);
 
-  if (!hasScannedPlan) {
+  const hasPlan = hasScannedPlan || Boolean(user?.guideline);
+
+  if (!hasPlan) {
     return (
       <SafeAreaView style={styles.safe} edges={['top']}>
         <View style={styles.container}>

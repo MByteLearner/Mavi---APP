@@ -65,8 +65,8 @@ const DEFAULT_DEMO_USER: AuthUser = {
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
-      isAuthenticated: true, // Default to true for smooth demo experience
-      user: DEFAULT_DEMO_USER,
+      isAuthenticated: false,
+      user: null,
       _hasHydrated: false,
       _setHydrated: (v) => set({ _hasHydrated: v }),
 

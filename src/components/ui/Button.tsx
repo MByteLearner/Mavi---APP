@@ -49,7 +49,7 @@ export const Button = forwardRef<View, ButtonProps>(function Button(
 ) {
   const colors = useThemeColors();
   const isDisabled = disabled || loading;
-  const sizeStyle = sizeStyles[size];
+  const sizeStyle = sizeStyles[size] ?? sizeStyles.lg;
 
   const variantStyles: Record<ButtonVariant, { container: ViewStyle; text: TextStyle }> = {
     primary: {
@@ -78,7 +78,7 @@ export const Button = forwardRef<View, ButtonProps>(function Button(
     },
   };
 
-  const variantStyle = variantStyles[variant];
+  const variantStyle = variantStyles[variant] ?? variantStyles.primary;
 
   return (
     <Pressable

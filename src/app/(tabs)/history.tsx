@@ -2,6 +2,8 @@ import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useUserStore } from '@/stores/useUserStore';
+import { router } from 'expo-router';
+import { useAuthStore } from '@/stores/useAuthStore';
 import {
   ScreenHeader,
   Chip,
@@ -9,6 +11,7 @@ import {
   GoalCard,
   NutritionCard,
   EmptyState,
+  Button,
   AnimatedEntry,
 } from '@/components/ui';
 import { Flame, Scale } from '@/components/ui/icons';
@@ -47,16 +50,27 @@ export default function HistoryScreen() {
   const colors = useThemeColors();
   const styles = createStyles(colors);
   const streak = useUserStore((state) => state.streak);
+  const hasScannedPlan = useUserStore((state) => state.hasScannedPlan);
+  const user = useAuthStore((s) => s.user);
+  const hasPlan = hasScannedPlan || Boolean(user?.guideline);
 
-  if (historyData.length === 0) {
+  if (!hasPlan) {
     return (
       <SafeAreaView style={styles.safe} edges={['top']}>
         <View style={styles.container}>
           <ScreenHeader eyebrow="Historial" title="Tu actividad" subtitle="Comidas registradas y progreso reciente" />
           <EmptyState
             illustration="history"
-            title="Aún no hay historial"
-            body="Empezá a registrar tus comidas para ver tu progreso en el tiempo."
+            title="Sin actividad registrada"
+            body="Subí o escaneá tu plan alimenticio para empezar a registrar tu actividad y progreso."
+            action={
+              <Button
+                label="Escanear plan"
+                size="md"
+                fullWidth={false}
+                onPress={() => router.push('/scan')}
+              />
+            }
           />
         </View>
       </SafeAreaView>
